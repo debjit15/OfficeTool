@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +17,7 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
+    <!-- Link to the new geo.css -->
     <link rel="stylesheet" href="./Assets/geo.css">
 
     <style>
@@ -27,7 +30,7 @@
             'opsz' 24;
         }
         
-        /* New styles for responsiveness and toast */
+        /* These styles are now primarily in geo.css, but keep here for immediate testing or specific overrides */
         body {
             display: flex;
             flex-direction: column;
@@ -65,7 +68,7 @@
         .toast.success { background-color: #28a745; }
         .toast.info { background-color: #0dcaf0; }
         
-        /* Style for the new user profile in the overlay (CSS for .custom-user-marker is in geo.js) */
+        /* Style for the new user profile in the overlay */
         .user-details {
             display: flex;
             align-items: center;
@@ -87,22 +90,22 @@
         }
     </style>
 </head>
-<body>
+<body class="portrait-mode"> <!-- 'portrait-mode' class added here, will be toggled by JS -->
 
     <nav>
         <div class="nav-container">
             <div class="brand">
                 <span class="material-symbols-outlined">satellite_alt</span>
-                GeoTag Pro
+                <span class="brand-text">GeoTag Pro</span>
             </div>
             <div class="actions">
                 <button id="fetchBtn" class="secondary-btn" title="Refresh GPS Coordinates">
                     <span class="material-symbols-outlined">my_location</span>
-                    Fetch GPS
+                    <span class="button-text">Fetch GPS</span>
                 </button>
                 <button id="logBtn" class="secondary-btn" title="View System Activity Logs">
                     <span class="material-symbols-outlined">article</span>
-                    Logs
+                    <span class="button-text">Logs</span>
                 </button>
             </div>
         </div>
@@ -140,6 +143,10 @@
     </main>
 
     <div id="controlPanel">
+        <!-- New buttons added here -->
+        <button id="galleryBtn" title="View Captured Images">
+            <span class="material-symbols-outlined">photo_library</span>
+        </button>
         <button id="flashBtn" title="Toggle Flash">
             <span class="material-symbols-outlined">flash_off</span>
         </button>
@@ -148,6 +155,12 @@
         </button>
         <button id="rotateBtn" title="Flip Camera">
             <span class="material-symbols-outlined">flip_camera_ios</span>
+        </button>
+        <button id="manualLocBtn" title="Set Location Manually">
+            <span class="material-symbols-outlined">pin_drop</span>
+        </button>
+        <button id="settingsBtn" title="App Settings">
+            <span class="material-symbols-outlined">settings</span>
         </button>
     </div>
 
@@ -161,10 +174,10 @@
             </div>
             <div class="action-buttons">
                 <button id="retakeBtn" class="secondary-btn" title="Discard and Retake">
-                    <span class="material-symbols-outlined">restart_alt</span> Retake
+                    <span class="material-symbols-outlined">restart_alt</span> <span class="button-text">Retake</span>
                 </button>
                 <button id="saveBtn" class="primary-btn" title="Download Image File">
-                    <span class="material-symbols-outlined">download</span> Save Image
+                    <span class="material-symbols-outlined">download</span> <span class="button-text">Save Image</span>
                 </button>
             </div>
         </div>
@@ -199,10 +212,10 @@
 
             <div class="action-buttons mt-6">
                 <button id="manualCancelBtn" class="secondary-btn" title="Close and use automatic GPS">
-                    <span class="material-symbols-outlined">close</span> Cancel
+                    <span class="material-symbols-outlined">close</span> <span class="button-text">Cancel</span>
                 </button>
                 <button id="manualConfirmBtn" class="primary-btn" title="Apply manual location and timestamp">
-                    <span class="material-symbols-outlined">check</span> Confirm Location
+                    <span class="material-symbols-outlined">check</span> <span class="button-text">Confirm Location</span>
                 </button>
             </div>
         </div>
@@ -214,6 +227,49 @@
         <button id="closeLogs" class="secondary-btn">Close Logs</button>
     </div>
 
+    <!-- New Settings Module -->
+    <div id="settingsModule" class="hidden">
+        <div class="animate__animated">
+            <h2>App Settings</h2>
+            <div class="settings-section">
+                <h3>User Information</h3>
+                <label>
+                    Display Name:
+                    <input type="text" id="settingDisplayName" placeholder="e.g., John Doe">
+                </label>
+                <label>
+                    Photo URL (Optional):
+                    <input type="url" id="settingPhotoURL" placeholder="https://example.com/me.jpg">
+                </label>
+                <p class="text-xs text-light-gray mt-1">Leave blank to use default avatar.</p>
+            </div>
+            <div class="action-buttons mt-6">
+                <button id="settingsCancelBtn" class="secondary-btn">
+                    <span class="material-symbols-outlined">close</span> <span class="button-text">Cancel</span>
+                </button>
+                <button id="settingsSaveBtn" class="primary-btn">
+                    <span class="material-symbols-outlined">save</span> <span class="button-text">Save Settings</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Gallery Module -->
+    <div id="galleryModule" class="hidden">
+        <div class="animate__animated">
+            <h2>Image Gallery</h2>
+            <div id="galleryContent">
+                <p class="text-light-gray">No images captured yet. Take a photo!</p>
+            </div>
+            <div class="action-buttons mt-6">
+                <button id="galleryCloseBtn" class="secondary-btn">
+                    <span class="material-symbols-outlined">close</span> <span class="button-text">Close Gallery</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     crossorigin="anonymous"></script>
     
@@ -222,6 +278,7 @@
         
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
+    <!-- Make sure to update geo.js with the new orientation logic -->
     <script src="./Assets/geo.js"></script>
 
 </body>
