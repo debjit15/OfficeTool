@@ -34,38 +34,42 @@
                         <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                 </div>
+                
+                <!-- Page Summary (visible icon) -->
+                <button class="btn btn-glass" data-module="summary" title="Page Summary" aria-label="Open page summary">
+                    <i class="fas fa-list-ul" aria-hidden="true"></i>
+                </button>
 
-                <!-- Quick Actions -->
-                <div class="quick-actions d-flex align-items-center gap-2">
-                    <button id="todayBtn" class="btn btn-glass" title="Go to Today" aria-label="Go to today">
-                        <i class="fas fa-calendar-day" aria-hidden="true"></i>
-                    </button>
-                    <button id="saveBtn" class="btn btn-primary" aria-live="polite" aria-atomic="true">
-                        <i class="fas fa-save me-1" aria-hidden="true"></i><span id="saveBtnText">Auto-saving...</span>
-                    </button>
-                </div>
-
-                <!-- Settings Dropdown -->
+                <!-- Unified Actions Menu (contains save, tools, export, user actions) -->
                 <div class="dropdown">
-                    <button class="btn btn-glass" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Open settings">
-                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                    <button id="topActionsBtn" class="btn btn-glass" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Open actions menu">
+                        <i class="fas fa-th-large" aria-hidden="true"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end animate__animated animate__slideIn" aria-label="Settings menu">
+                    <ul class="dropdown-menu dropdown-menu-end animate__animated animate__slideIn" aria-label="Actions menu">
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" id="todayBtn" title="Go to Today" aria-label="Go to today">
+                                <i class="fas fa-calendar-day" aria-hidden="true"></i>
+                                <span>Today</span>
+                            </button>
+                        </li>
+                        <li>
+                            <!-- Keep original save button markup but inside a dropdown item -->
+                            <button class="dropdown-item d-flex align-items-center gap-2" id="saveBtn" aria-live="polite" aria-atomic="true" aria-label="Save status">
+                                <span class="me-2">
+                                    <i class="fas fa-save save-icon" aria-hidden="true"></i>
+                                    <i class="fas fa-sync-alt sync-icon animate-spin" aria-hidden="true" style="display:none;"></i>
+                                    <i class="fas fa-check success-icon" aria-hidden="true" style="display:none;"></i>
+                                    <i class="fas fa-exclamation-triangle warning-icon" aria-hidden="true" style="display:none;"></i>
+                                </span>
+                                <span>Save</span>
+                            </button>
+                        </li>
                         <li>
                             <button class="dropdown-item" data-module="settings">
                                 <i class="fas fa-cog me-2"></i>Settings
                             </button>
                         </li>
-                        <li>
-                            <button class="dropdown-item" data-module="summary">
-                                <i class="fas fa-chart-bar me-2"></i>Page Analytics
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item" data-module="image">
-                                <i class="fas fa-image me-2"></i>Add Image
-                            </button>
-                        </li>
+                        
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <button class="dropdown-item" id="exportBtn">
@@ -77,32 +81,20 @@
                                 <i class="fas fa-print me-2"></i>Print Entry
                             </button>
                         </li>
-                    </ul>
-                </div>
-
-                <!-- User Menu -->
-                <div class="dropdown">
-                    <button class="btn btn-glass d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
-                        <div class="user-avatar" aria-hidden="true">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <span class="user-name d-none d-md-inline" id="userName">Loading...</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end animate__animated animate__slideIn" aria-label="User account menu">
-                        <li>
-                            <div class="dropdown-header">
-                                <strong>Account</strong>
-                            </div>
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li>
                             <button class="dropdown-item" id="syncBtn">
                                 <i class="fas fa-sync me-2"></i>Sync Entries
                             </button>
                         </li>
                         <li>
-                            <button class="dropdown-item" id="backupBtn">
-                                <i class="fas fa-cloud-download-alt me-2"></i>Backup Data
-                            </button>
+                            <div class="d-flex flex-column px-2">
+                                <button class="dropdown-item align-items-center d-flex" id="backupBtn">
+                                    <i class="fas fa-cloud-download-alt me-2"></i>
+                                    <span>Backup Data</span>
+                                </button>
+                                <small id="backupSublabel" class="text-muted ms-3">Last backup: -</small>
+                            </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
@@ -170,145 +162,137 @@
     </main>
 
     <!-- Module Templates (Hidden) -->
-    <template id="imageModuleTemplate">
-        <div class="diary-module image-module">
-            <div class="module-header">
-                <span class="module-title">Image</span>
-                <div class="module-actions">
-                    <button class="btn btn-sm btn-outline-danger remove-module" title="Remove module" aria-label="Remove image module">
-                        <i class="fas fa-times"></i>
-                    </button>
+    <!-- Settings Modal (Bootstrap) -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-cog me-2"></i>Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="module-content">
-                <input type="file" accept="image/*" class="form-control" aria-label="Upload image">
-                <div class="image-preview mt-2" aria-hidden="true"></div>
+                <div class="modal-body">
+                    <div class="settings-grid">
+                        <!-- Theme Setting -->
+                        <div class="setting-item mb-3">
+                            <label class="setting-label">
+                                <i class="fas fa-palette me-2" aria-hidden="true"></i>Theme
+                            </label>
+                            <div class="theme-options">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light">
+                                    <label class="form-check-label" for="lightTheme"><i class="fas fa-sun"></i> Light</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark">
+                                    <label class="form-check-label" for="darkTheme"><i class="fas fa-moon"></i> Dark</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="theme" id="sepiaTheme" value="sepia">
+                                    <label class="form-check-label" for="sepiaTheme"><i class="fas fa-book"></i> Sepia</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Font Setting -->
+                        <div class="setting-item mb-3">
+                            <label class="setting-label"><i class="fas fa-font me-2"></i>Font Style</label>
+                            <select class="form-select" id="fontSelect" aria-label="Choose font">
+                                <option value="Poppins" style="font-family: Poppins">Poppins</option>
+                                <option value="Merriweather" style="font-family: Merriweather">Merriweather</option>
+                                <option value="Roboto Mono" style="font-family: 'Roboto Mono'">Roboto Mono</option>
+                            </select>
+                        </div>
+
+                        <!-- Font Size Setting -->
+                        <div class="setting-item mb-3">
+                            <label class="setting-label"><i class="fas fa-text-height me-2"></i>Font Size</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="range" class="form-range flex-grow-1" id="fontSizeRange" min="12" max="24" step="1" aria-label="Font size">
+                                <span class="font-size-value" id="fontSizeValue">16px</span>
+                            </div>
+                        </div>
+
+                        <!-- Auto-save Setting -->
+                        <div class="setting-item mb-3">
+                            <label class="setting-label"><i class="fas fa-clock me-2"></i>Auto-save Interval</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="autoSaveInterval" min="5" max="300" value="30" aria-label="Auto save interval">
+                                <span class="input-group-text">seconds</span>
+                            </div>
+                            <small class="text-muted mt-1">Range: 5-300 seconds</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary apply-settings"><i class="fas fa-check me-2"></i>Apply Changes</button>
+                </div>
             </div>
         </div>
-    </template>
+    </div>
 
-    <template id="settingsModuleTemplate">
-        <div class="diary-module settings-module">
-            <div class="module-header">
-                <span class="module-title">
-                    <i class="fas fa-cog me-2" aria-hidden="true"></i>Settings
-                </span>
-                <div class="module-actions">
-                    <button class="btn btn-sm btn-outline-secondary remove-module" title="Close settings" aria-label="Close settings">
-                        <i class="fas fa-times"></i>
-                    </button>
+    <!-- Summary Modal (Complete Diary Summary) -->
+    <div class="modal fade" id="summaryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-list-ul me-2"></i>Complete Diary Summary</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="module-content p-4">
-                <div class="settings-grid">
-                    <!-- Theme Setting -->
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <i class="fas fa-palette me-2" aria-hidden="true"></i>Theme
-                        </label>
-                        <div class="theme-options">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light" checked>
-                                <label class="form-check-label" for="lightTheme">
-                                    <i class="fas fa-sun"></i> Light
-                                </label>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="card p-3 mb-2">
+                                <small class="text-muted">Total Entries</small>
+                                <div id="summaryTotalEntries" class="h4">0</div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark">
-                                <label class="form-check-label" for="darkTheme">
-                                    <i class="fas fa-moon"></i> Dark
-                                </label>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card p-3 mb-2">
+                                <small class="text-muted">Total Words</small>
+                                <div id="summaryTotalWords" class="h4">0</div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="theme" id="sepiaTheme" value="sepia">
-                                <label class="form-check-label" for="sepiaTheme">
-                                    <i class="fas fa-book"></i> Sepia
-                                </label>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card p-3 mb-2">
+                                <small class="text-muted">Average Words / Entry</small>
+                                <div id="summaryAvgWords" class="h4">0</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Font Setting -->
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <i class="fas fa-font me-2" aria-hidden="true"></i>Font Style
-                        </label>
-                        <select class="form-select" id="fontSelect" aria-label="Choose font">
-                            <option value="Poppins" style="font-family: Poppins">Poppins</option>
-                            <option value="Merriweather" style="font-family: Merriweather">Merriweather</option>
-                            <option value="Roboto Mono" style="font-family: 'Roboto Mono'">Roboto Mono</option>
-                        </select>
+                    <div class="mb-3">
+                        <input type="text" id="summarySearch" class="form-control" placeholder="Filter by date or text...">
                     </div>
 
-                    <!-- Font Size Setting -->
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <i class="fas fa-text-height me-2" aria-hidden="true"></i>Font Size
-                        </label>
-                        <div class="d-flex align-items-center gap-3">
-                            <input type="range" class="form-range flex-grow-1" id="fontSizeRange" min="12" max="24" step="1" aria-label="Font size">
-                            <span class="font-size-value" id="fontSizeValue">16px</span>
+                    <div class="table-responsive">
+                        <div class="mb-3">
+                            <canvas id="summaryPieChart" height="160" aria-label="Summary pie chart"></canvas>
                         </div>
+                        <table class="table table-sm" id="summaryTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Words</th>
+                                    <th>Last Modified</th>
+                                    <th>Preview</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
-
-                    <!-- Auto-save Setting -->
-                    <div class="setting-item">
-                        <label class="setting-label">
-                            <i class="fas fa-clock me-2" aria-hidden="true"></i>Auto-save Interval
-                        </label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="autoSaveInterval" min="5" max="300" value="30" aria-label="Auto save interval">
-                            <span class="input-group-text">seconds</span>
-                        </div>
-                        <small class="text-muted mt-1">Range: 5-300 seconds</small>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    </template>
+    </div>
 
-    <template id="summaryModuleTemplate">
-        <div class="diary-module summary-module">
-            <div class="module-header">
-                <span class="module-title">
-                    <i class="fas fa-list-ul me-2" aria-hidden="true"></i>Page Summary
-                </span>
-                <div class="module-actions">
-                    <button class="btn btn-sm btn-outline-secondary remove-module" title="Close summary" aria-label="Close summary">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="module-content p-3">
-                <div class="summary-stats mb-3">
-                    <div class="stat-item">
-                        <small class="text-muted">Word Count</small>
-                        <span class="stat-value" id="wordCount">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <small class="text-muted">Characters</small>
-                        <span class="stat-value" id="charCount">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <small class="text-muted">Last Modified</small>
-                        <span class="stat-value" id="lastModified">-</span>
-                    </div>
-                </div>
-                <div class="summary-keywords mb-3">
-                    <label class="setting-label mb-2">
-                        <i class="fas fa-tags me-2" aria-hidden="true"></i>Keywords
-                    </label>
-                    <div class="keyword-chips" id="keywordContainer" aria-live="polite"></div>
-                </div>
-                <div class="summary-preview">
-                    <label class="setting-label mb-2">
-                        <i class="fas fa-align-left me-2" aria-hidden="true"></i>Quick Preview
-                    </label>
-                    <p class="preview-text" id="contentPreview">No content yet</p>
-                </div>
-            </div>
-        </div>
-    </template>
+    <!-- Hidden global image input (used by Add Image action) -->
+    <input type="file" id="globalImageInput" accept="image/*" style="display:none">
 
     <!-- Confirm Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
@@ -349,6 +333,8 @@
 
     <!-- Your application JS (module) -->
     <!-- Ensure ./Assets/app.js exists and contains Quill initialization & handlers -->
+    <!-- Chart.js for summary pie chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="./Assets/app.js"></script>
     
     <!-- Service Worker Registration -->
