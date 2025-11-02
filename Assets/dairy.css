@@ -131,9 +131,46 @@ body {
     background: var(--bg-main);
     border-radius: var(--module-radius);
     box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    margin: 16px;
+    margin: 0;
     overflow: hidden;
     animation: slideDown var(--transition-normal) ease-out;
+    transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1000;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.diary-module.fullscreen {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    border-radius: 0;
+    max-height: calc(100vh - var(--navbar-height));
+    z-index: 1050;
+}
+
+.diary-module.fullscreen .module-content {
+    max-height: calc(100vh - var(--navbar-height) - 56px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.diary-module.fullscreen .module-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.diary-module.fullscreen .module-content::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+
+.diary-module.fullscreen .module-content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
 }
 
 .module-header {
@@ -143,6 +180,32 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.module-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.module-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+    z-index: 1040;
+}
+
+.module-backdrop.active {
+    opacity: 1;
+    visibility: visible;
 }
 
 .module-title {
@@ -204,6 +267,85 @@ body {
     border: none;
 }
 
+/* Save Button Styles */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.btn-icon i {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.btn-icon i.save-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Button States */
+.btn-icon.saving .save-icon,
+.btn-icon.success .save-icon,
+.btn-icon.warning .save-icon {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.btn-icon.saving .sync-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-icon.success .success-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-icon.warning .warning-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Save button inside dropdown (keeps same state behavior) */
+#saveBtn i {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#saveBtn .save-icon {
+    display: inline-block;
+    opacity: 1;
+}
+
+#saveBtn.saving .save-icon {
+    display: none;
+    opacity: 0;
+}
+
+#saveBtn.saving .sync-icon {
+    display: inline-block;
+    opacity: 1;
+}
+
+#saveBtn.success .success-icon {
+    display: inline-block;
+    opacity: 1;
+}
+
+#saveBtn.warning .warning-icon {
+    display: inline-block;
+    opacity: 1;
+}
+
 /* Animations */
 @keyframes slideDown {
     from {
@@ -216,6 +358,23 @@ body {
     }
 }
 
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Module Container Position */
+.module-container {
+    position: relative;
+    min-height: 100px;
+    margin-top: 16px;
+    z-index: 10;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -224,6 +383,47 @@ body {
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+/* Page fold transition (used when changing diary pages) */
+.page-fold-out {
+    animation: foldOut 240ms ease-in forwards;
+    transform-origin: top center;
+}
+
+.page-fold-in {
+    animation: foldIn 260ms cubic-bezier(.2,.9,.3,1) forwards;
+    transform-origin: top center;
+}
+
+@keyframes foldOut {
+    0% {
+        opacity: 1;
+        transform: perspective(800px) rotateX(0deg) translateY(0);
+    }
+    60% {
+        opacity: 0.9;
+        transform: perspective(800px) rotateX(20deg) translateY(-8px) scaleY(0.98);
+    }
+    100% {
+        opacity: 0;
+        transform: perspective(800px) rotateX(85deg) translateY(-28px) scaleY(0.7);
+    }
+}
+
+@keyframes foldIn {
+    0% {
+        opacity: 0;
+        transform: perspective(800px) rotateX(85deg) translateY(-28px) scaleY(0.7);
+    }
+    60% {
+        opacity: 0.9;
+        transform: perspective(800px) rotateX(12deg) translateY(-6px) scaleY(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(800px) rotateX(0deg) translateY(0) scaleY(1);
     }
 }
 
