@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GeoTag Pro Dashboard</title>
 
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./Assets/icons/icon-256x256.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./Assets/icons/icon-256x256.png">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- SEO and Social Meta Tags -->
+  <meta name="description" content="GeoTag Pro - Office Tools Dashboard for Banking, Finance, Insurance, and Utility.">
+  <meta name="keywords" content="GeoTag, Dashboard, Office Tools, Bank, Finance, Insurance, PDF, CV, Image, Calculator, SIP, EMI, Denomination">
+  <meta name="author" content="GeoTag Pro Team">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="GeoTag Pro Dashboard">
+  <meta property="og:description" content="GeoTag Pro - Office Tools Dashboard for Banking, Finance, Insurance, and Utility.">
+  <meta property="og:image" content="./Assets/icons/icon-256x256.png">
+  <meta property="og:url" content="https://yourdomain.com">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GeoTag Pro Dashboard">
+  <meta name="twitter:description" content="GeoTag Pro - Office Tools Dashboard for Banking, Finance, Insurance, and Utility.">
+  <meta name="twitter:image" content="./Assets/icons/icon-256x256.png">
+
   <!-- Bootstrap & Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
@@ -12,49 +35,177 @@
 
   <style>
     :root {
-      --brand-gradient: linear-gradient(135deg,#0d6efd 0%, #6610f2 100%);
-      --bg-light: #f6f9fe;
-      --card-bg: #fff;
-      --muted: #6c757d;
-      --accent: #0d6efd;
-      --radius: 16px;
-      --shadow: 0 6px 24px rgba(13,110,253,0.12);
+      /* Premium dark gradient and accent colors */
+      --brand-gradient: linear-gradient(135deg, #181b2e 0%, #301c49 100%);
+      --bg-dark: #161622;
+      --bg-card-dark: #222338;
+      --card-bg: var(--bg-card-dark);
+      --muted: #b7b8c5;
+      --accent: #8e61ff;
+      --accent-secondary: #3fc2ff;
+      --radius: 18px;
+      --shadow: 0 8px 32px rgba(40, 18, 70, 0.28);
+      --border: 1px solid #222338;
+      --modal-bg: #181b2e;
       font-family: 'Poppins', system-ui, sans-serif;
     }
-    body { background: var(--bg-light); color: #1f2937; min-height: 100vh; }
-    .navbar { background: var(--brand-gradient); box-shadow: 0 4px 16px rgba(13,110,253,0.15); }
-    .navbar-brand { font-weight: 700; font-size: 1.6rem; color: #fff !important; }
+    body {
+      background: var(--bg-dark);
+      color: #e5e7ef;
+      min-height: 100vh;
+    }
+    .navbar {
+      background: var(--brand-gradient);
+      box-shadow: 0 4px 18px rgba(40, 18, 70, 0.28);
+      border-bottom: var(--border);
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: #fff !important;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 18px #8e61ff44;
+    }
     .dashboard-cards { gap: 1.5rem; }
     .tool-card {
-      background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
-      padding: 1.8rem 1.4rem; transition: all .3s ease; cursor: pointer;
-      display: flex; flex-direction: column; justify-content: flex-start; min-height: 220px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: var(--border);
+      padding: 2.1rem 1.5rem;
+      transition: all .23s cubic-bezier(.5,.23,.2,1.0);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
     }
-    .tool-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(13,110,253,0.18); }
-    .tool-card-icon { font-size: 2.8rem; margin-bottom: 0.8rem; }
-    .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .card-text { color: var(--muted); font-size: 0.95rem; }
-    .btn { border-radius: 0.6rem; font-weight: 600; }
-    .modal-content { border-radius: var(--radius); box-shadow: 0 8px 28px rgba(13,110,253,0.15); }
-    .modal-header { border-bottom: none; }
-    @media (max-width: 767px) {
+    .tool-card:hover {
+      background: linear-gradient(135deg, #201f40 0%, #391f5a 100%);
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 16px 48px #8e61ff33;
+      border-color: #8e61ff;
+    }
+    .tool-card-icon {
+      font-size: 3.2rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      filter: drop-shadow(0 2px 6px #3fc2ff88);
+    }
+    .card-title {
+      font-size: 1.22rem;
+      font-weight: 700;
+      margin-bottom: 0.45rem;
+      color: #fff;
+      text-shadow: 0 1px 12px #3fc2ff22;
+    }
+    .card-text {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .btn {
+      border-radius: 0.6rem;
+      font-weight: 600;
+      background: var(--brand-gradient);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 10px #8e61ff44;
+    }
+    .btn:hover, .btn:focus {
+      background: linear-gradient(135deg,#8e61ff 0%, #3fc2ff 100%);
+      color: #fff;
+      box-shadow: 0 6px 18px #8e61ff44;
+    }
+    .modal-content {
+      border-radius: var(--radius);
+      background: var(--modal-bg);
+      box-shadow: 0 8px 28px #8e61ff25;
+      border: var(--border);
+      color: #e5e7ef;
+    }
+    .modal-header {
+      border-bottom: none;
+      background: #201f40;
+      color: #fff;
+    }
+    .modal-title {
+      color: #fff;
+      text-shadow: 0 2px 8px #8e61ff22;
+    }
+    .table {
+      background: var(--card-bg);
+      color: #e5e7ef;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table th, .table td {
+      border-color: #2c2c48;
+    }
+    .table-light {
+      background: #222338;
+      color: #b7b8c5;
+    }
+    .table-info {
+      background: #22175b;
+      color: #8e61ff;
+    }
+    .badge {
+      font-size: 0.8rem;
+      border-radius: 0.4rem;
+      background: linear-gradient(135deg,#8e61ff 0%, #301c49 100%);
+      color: #fff;
+      margin-right: 0.15rem;
+    }
+    #notificationContainer {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1060;
+      min-width: 320px;
+    }
+    .alert-primary {
+      background: linear-gradient(135deg,#8e61ffcc 0%, #3fc2ffcc 100%);
+      color: #fff;
+      border: none;
+      box-shadow: 0 6px 24px #8e61ff44;
+    }
+    /* Premium scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: #222338;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #8e61ff88;
+      border-radius: 8px;
+    }
+    /* Responsive Tweaks */
+    @media (max-width: 991px) {
       .dashboard-cards { gap: 1rem; }
-      .tool-card { padding: 1.2rem; }
+      .tool-card { min-height: 180px; padding: 1.1rem; }
+    }
+    @media (max-width: 767px) {
+      .dashboard-cards { gap: 0.75rem; }
+      .tool-card { min-height: 140px; padding: 0.7rem; }
+      .navbar-brand { font-size: 1.2rem; }
     }
   </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg sticky-top">
+  <nav class="navbar navbar-expand-lg sticky-top" aria-label="GeoTag Pro Main Navigation">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">GeoTag Pro</a>
       <div class="ms-auto d-flex align-items-center gap-3">
         <div id="googleSignInButtonContainer">
-          <button id="googleSignInBtn" class="btn btn-outline-light btn-sm">Sign in with Google</button>
-          <button id="googleSignOutBtn" class="btn btn-danger btn-sm d-none">Sign out</button>
+          <button id="googleSignInBtn" class="btn btn-outline-light btn-sm" aria-label="Sign in with Google">Sign in with Google</button>
+          <button id="googleSignOutBtn" class="btn btn-danger btn-sm d-none" aria-label="Sign out">Sign out</button>
         </div>
         <div class="dropdown d-none" id="userProfileDisplay">
-          <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User Profile">
             <img id="userPhoto" src="./Assets/icons/icon-256x256.png" alt="User" class="rounded-circle" width="44" height="44">
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="navbarDropdown">
@@ -67,51 +218,366 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <div class="container py-5">
-    <h1 class="fw-bold mb-4 text-dark display-6">Welcome to GeoTag Pro</h1>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 dashboard-cards">
-      <div class="col">
-        <div class="tool-card" onclick="window.location.href='geo.html'">
-          <span class="material-symbols-outlined text-primary tool-card-icon">photo_camera_front</span>
-          <div class="card-title">Geo Camera</div>
-          <div class="card-text">Capture photos with GPS location and timestamp details.</div>
+  <!-- Notification Container for Toasts -->
+<div id="notificationContainer"></div>
+
+<!-- PWA Install Banner (PLACE THIS HERE, NOT INSIDE THE CARD GRID) -->
+<div id="installBanner" class="alert alert-primary d-none shadow-lg mb-4"
+  style="position: fixed; bottom: 24px; right: 24px; z-index: 1055; min-width: 320px;">
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <strong>Install GeoTag Pro?</strong>
+      <div class="small text-muted">Add this app to your device for offline access and faster launch.</div>
+    </div>
+    <button id="installButton" class="btn btn-success btn-sm ms-3">Install</button>
+  </div>
+</div>
+
+<!-- TOOL SEARCH BAR -->
+<div class="container py-3">
+  <div class="row">
+    <div class="col-lg-6 mx-auto">
+      <input class="form-control form-control-lg" id="toolSearchInput" placeholder="Search tools (e.g. 'pdf', 'insurance', 'cv')..." autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<!-- TOOL GROUPS -->
+<div class="container py-5">
+  <h2 class="fw-bold mb-3 text-dark">Banking & Finance Tools</h2>
+  <div class="row dashboard-cards" id="bankFinanceTools">
+    <!-- EMI Calculator -->
+    <div class="col tool-card-wrap" data-tags="finance loan emi bank calculator">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#emiCalculatorModal" tabindex="0" data-tool="EMI Calculator">
+        <span class="material-symbols-outlined text-danger tool-card-icon">percent</span>
+        <div class="card-title">EMI Calculator</div>
+        <div class="card-text">Calculate loan EMIs with breakdowns.</div>
+        <span class="badge bg-success mt-2">Finance</span>
+        <span class="badge bg-primary mt-2">Bank</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Cash Denomination Tally -->
+    <div class="col tool-card-wrap" data-tags="cash tally bank counting denomination">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#denominationModal" tabindex="0" data-tool="Cash Denomination Tally">
+        <span class="material-symbols-outlined text-danger tool-card-icon">currency_rupee</span>
+        <div class="card-title">Cash Denomination Tally</div>
+        <div class="card-text">Calculate cash total by note/coin counts.</div>
+        <span class="badge bg-primary mt-2">Bank</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Loan Eligibility Checker -->
+    <div class="col tool-card-wrap" data-tags="loan eligibility finance bank checker">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#loanEligibilityModal" tabindex="0" data-tool="Loan Eligibility Checker">
+        <span class="material-symbols-outlined text-success tool-card-icon">check_circle</span>
+        <div class="card-title">Loan Eligibility Checker</div>
+        <div class="card-text">Find out if you qualify for a loan.</div>
+        <span class="badge bg-success mt-2">Finance</span>
+        <span class="badge bg-primary mt-2">Bank</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Insurance Premium Calculator -->
+    <div class="col tool-card-wrap" data-tags="insurance premium calculator finance">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#insurancePremiumModal" tabindex="0" data-tool="Insurance Premium Calculator">
+        <span class="material-symbols-outlined text-warning tool-card-icon">health_and_safety</span>
+        <div class="card-title">Insurance Premium Calculator</div>
+        <div class="card-text">Calculate insurance policy premiums.</div>
+        <span class="badge bg-warning mt-2">Insurance</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- SIP Calculator -->
+    <div class="col tool-card-wrap" data-tags="sip mutual fund investment finance calculator">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#sipCalculatorModal" tabindex="0" data-tool="SIP Calculator">
+        <span class="material-symbols-outlined text-info tool-card-icon">calculate</span>
+        <div class="card-title">SIP Calculator</div>
+        <div class="card-text">Estimate mutual fund SIP returns.</div>
+        <span class="badge bg-success mt-2">Finance</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="fw-bold mb-3 mt-5 text-dark">Document & Utility Tools</h2>
+  <div class="row dashboard-cards" id="generalTools">
+    <!-- Image to PDF -->
+    <div class="col tool-card-wrap" data-tags="image pdf converter document utility">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#imageToPdfModal" tabindex="0" data-tool="Image to PDF">
+        <span class="material-symbols-outlined text-secondary tool-card-icon">picture_as_pdf</span>
+        <div class="card-title">Image to PDF</div>
+        <div class="card-text">Convert images into a single PDF document.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- PDF to Image -->
+    <div class="col tool-card-wrap" data-tags="pdf image converter document utility">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#pdfToImageModal" tabindex="0" data-tool="PDF to Image">
+        <span class="material-symbols-outlined text-secondary tool-card-icon">image</span>
+        <div class="card-title">PDF to Image</div>
+        <div class="card-text">Extract images from a PDF file.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Image Compress -->
+    <div class="col tool-card-wrap" data-tags="image compress utility optimize">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#imageCompressModal" tabindex="0" data-tool="Image Compress">
+        <span class="material-symbols-outlined text-success tool-card-icon">compress</span>
+        <div class="card-title">Image Compress</div>
+        <div class="card-text">Reduce image file size easily.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- CV/Resume Maker -->
+    <div class="col tool-card-wrap" data-tags="cv resume maker document job insurance finance bank utility">
+      <div class="tool-card" onclick="window.open('https://kurcur.shop/canova.html','_blank')" tabindex="0" data-tool="CV/Resume Maker">
+        <span class="material-symbols-outlined text-info tool-card-icon">assignment_ind</span>
+        <div class="card-title">CV/Resume Maker</div>
+        <div class="card-text">Generate professional CVs and resumes.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <span class="badge bg-success mt-2">Finance</span>
+        <span class="badge bg-primary mt-2">Bank</span>
+        <span class="badge bg-warning mt-2">Insurance</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Digit Speller -->
+    <div class="col tool-card-wrap" data-tags="digit speller number words utility">
+      <div class="tool-card" data-bs-toggle="modal" data-bs-target="#digitSpellerModal" tabindex="0" data-tool="Digit Speller (Indian)">
+        <span class="material-symbols-outlined text-warning tool-card-icon">spellcheck</span>
+        <div class="card-title">Digit Speller (Indian)</div>
+        <div class="card-text">Convert numbers into words using Indian numbering.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Digital Diary -->
+    <div class="col tool-card-wrap" data-tags="diary notes utility journal">
+      <div class="tool-card" onclick="window.location.href='dairy.html'" tabindex="0" data-tool="Digital Diary">
+        <span class="material-symbols-outlined text-info tool-card-icon">menu_book</span>
+        <div class="card-title">Digital Diary</div>
+        <div class="card-text">Write, store, and manage daily notes digitally.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+    <!-- Geo Camera -->
+    <div class="col tool-card-wrap" data-tags="geo camera image location photo utility">
+      <div class="tool-card" onclick="window.location.href='geo.html'" tabindex="0" data-tool="Geo Camera">
+        <span class="material-symbols-outlined text-primary tool-card-icon">photo_camera_front</span>
+        <div class="card-title">Geo Camera</div>
+        <div class="card-text">Capture photos with GPS location and timestamp details.</div>
+        <span class="badge bg-secondary mt-2">Utility</span>
+        <button class="btn btn-outline-warning btn-sm mt-2 fav-btn" title="Add to Favorites">
+          <span class="material-symbols-outlined">star</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAVORITE TOOLS SECTION -->
+<div class="container py-3 d-none" id="favoriteToolsSection">
+  <h2 class="fw-bold mb-3 text-warning">Your Favorite Tools</h2>
+  <div class="row dashboard-cards" id="favoriteTools"></div>
+</div>
+
+
+
+<!-- Image to PDF Modal -->
+<div class="modal fade" id="imageToPdfModal" tabindex="-1" aria-labelledby="imageToPdfModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageToPdfModalLabel">Image to PDF</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="file" multiple accept="image/*" class="form-control mb-3" id="imagesForPdfInput">
+        <button class="btn btn-primary" id="convertImagesToPdfBtn">Convert to PDF</button>
+        <div id="imageToPdfResult" class="mt-3"></div>
+        <div class="mt-3">
+          <ul id="imageToPdfFileSizeList" class="list-group"></ul>
+          <div id="imageToPdfOutputSize" class="mt-2"></div>
         </div>
       </div>
-      <div class="col">
-        <div class="tool-card" onclick="window.location.href='dairy.html'">
-          <span class="material-symbols-outlined text-info tool-card-icon">menu_book</span>
-          <div class="card-title">Digital Diary</div>
-          <div class="card-text">Write, store, and manage daily notes digitally.</div>
-        </div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF to Image Modal -->
+<div class="modal fade" id="pdfToImageModal" tabindex="-1" aria-labelledby="pdfToImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pdfToImageModalLabel">PDF to Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="col">
-        <div class="tool-card" data-bs-toggle="modal" data-bs-target="#digitSpellerModal">
-          <span class="material-symbols-outlined text-warning tool-card-icon">spellcheck</span>
-          <div class="card-title">Digit Speller (Indian)</div>
-          <div class="card-text">Convert numbers into words using Indian numbering.</div>
-        </div>
+      <div class="modal-body">
+        <input type="file" accept="application/pdf" class="form-control mb-3" id="pdfForImageInput">
+        <button class="btn btn-primary" id="convertPdfToImageBtn">Extract Images</button>
+        <div id="pdfToImageResult" class="mt-3"></div>
+        <div id="pdfToImageFileSizeList" class="mt-3"></div>
       </div>
-      <div class="col">
-        <div class="tool-card" data-bs-toggle="modal" data-bs-target="#denominationModal">
-          <span class="material-symbols-outlined text-danger tool-card-icon">currency_rupee</span>
-          <div class="card-title">Cash Denomination Tally</div>
-          <div class="card-text">Calculate cash total by note/coin counts.</div>
-        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Compress Modal -->
+<div class="modal fade" id="imageCompressModal" tabindex="-1" aria-labelledby="imageCompressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageCompressModalLabel">Image Compress</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="col">
-        <div class="tool-card" data-bs-toggle="modal" data-bs-target="#emiCalculatorModal">
-          <span class="material-symbols-outlined text-danger tool-card-icon">percent</span>
-          <div class="card-title">EMI Calculator</div>
-          <div class="card-text">Calculate loan EMIs with breakdowns.</div>
+      <div class="modal-body">
+        <input type="file" accept="image/*" class="form-control mb-3" id="imageCompressInput">
+        <label for="compressQuality" class="form-label">Compression Quality</label>
+        <input type="range" id="compressQuality" min="10" max="100" value="70" class="form-range mb-3">
+        <button class="btn btn-primary" id="compressImageBtn">Compress</button>
+        <div id="imageCompressResult" class="mt-3"></div>
+        <div id="imageCompressSizeDetails" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Digit Speller Modal -->
+  <div class="modal fade" id="digitSpellerModal" tabindex="-1" aria-labelledby="digitSpellerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="digitSpellerModalLabel">Digit Speller (Indian)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="digitInput" class="form-label">Enter Number</label>
+            <input type="number" class="form-control" id="digitInput" placeholder="Eg: 123456" min="0">
+          </div>
+          <div>
+            <strong>Spelling Output:</strong>
+            <div id="spellingOutput" class="mt-2 text-primary"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Example Modals (Digit Speller, Denomination, EMI, Profile) -->
-  <!-- ... (reuse the modal code we built earlier) ... -->
+  <!-- Cash Denomination Tally Modal -->
+  <div class="modal fade" id="denominationModal" tabindex="-1" aria-labelledby="denominationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="denominationModalLabel">Cash Denomination Tally</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Denomination</th>
+                <th class="text-center">Count</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="denominationTallyBody"></tbody>
+            <tfoot>
+              <tr class="table-info">
+                <td colspan="2" class="text-end fw-bold">Grand Total</td>
+                <td class="text-end fw-bold" id="grandTotalDisplay">₹0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- EMI Calculator Modal -->
+  <div class="modal fade" id="emiCalculatorModal" tabindex="-1" aria-labelledby="emiCalculatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="emiCalculatorModalLabel">EMI Calculator</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body row g-4">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="principalInput" class="form-label">Principal Amount</label>
+              <input type="number" class="form-control emi-calc-input" id="principalInput" placeholder="Eg: 50000" min="0">
+            </div>
+            <div class="mb-3">
+              <label for="rateSlider" class="form-label">Interest Rate (%) <span id="rateDisplay">8%</span></label>
+              <input type="range" class="form-range emi-calc-input" id="rateSlider" min="0" max="25" step="0.1" value="8">
+            </div>
+            <div class="mb-3">
+              <label for="timeInput" class="form-label">Tenure (Years)</label>
+              <input type="number" class="form-control emi-calc-input" id="timeInput" placeholder="Eg: 5" min="0">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-2"><strong>Monthly EMI:</strong> <span id="outputEMI" class="text-success fw-bold">₹0</span></div>
+            <div class="mb-2"><strong>Principal:</strong> <span id="outputPrincipal">₹0</span></div>
+            <div class="mb-2"><strong>Total Interest:</strong> <span id="outputTotalInterest">₹0</span></div>
+            <div class="mb-2"><strong>Total Payment:</strong> <span id="outputTotalPayment">₹0</span></div>
+            <div class="mt-3">
+              <canvas id="emiPieChart" style="max-width: 100%; min-height: 220px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal (Optional, for user details) -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">My Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="profileModalPhoto" src="./Assets/icons/icon-256x256.png" class="rounded-circle mb-3" width="80" height="80">
+          <h5 id="profileModalName">User</h5>
+          <p id="profileModalEmail" class="text-muted small">user@email.com</p>
+          <button class="btn btn-danger mt-3" id="profileModalSignOut">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
   <!-- Firebase + Auth + Database -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
@@ -140,7 +606,6 @@
     const userPhoto = document.getElementById("userPhoto");
     const userName = document.getElementById("userName");
 
-        // Save user data to Realtime DB
     function saveUserData(user) {
       set(ref(db, 'users/' + user.uid), {
         username: user.displayName,
@@ -149,7 +614,6 @@
       });
     }
 
-    // Update UI when user signs in/out
     function updateUI(user) {
       if (user) {
         signInBtn.classList.add("d-none");
@@ -159,7 +623,6 @@
         userPhoto.src = user.photoURL;
         userName.textContent = user.displayName;
 
-        // Save to database
         saveUserData(user);
       } else {
         signInBtn.classList.remove("d-none");
@@ -171,7 +634,6 @@
       }
     }
 
-    // Sign in with Google
     signInBtn.addEventListener("click", () => {
       signInWithPopup(auth, provider)
         .then(result => {
@@ -183,22 +645,23 @@
         });
     });
 
-    // Sign out
     signOutBtn.addEventListener("click", () => {
       signOut(auth)
         .then(() => updateUI(null))
         .catch(error => console.error("Sign-out error:", error));
     });
 
-    // Keep UI synced with auth state
     onAuthStateChanged(auth, (user) => {
       updateUI(user);
     });
   </script>
 
-  <!-- Bootstrap & jQuery -->
+  <!-- Bootstrap & jQuery & Chart.js & App logic -->
+   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="./Assets/tool.js"></script>
 </body>
 </html>
