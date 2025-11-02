@@ -1,0 +1,597 @@
+:root {
+    /* Color Palette */
+    --color-primary: #0dcaf0;       /* Cyan/Info Blue */
+    --color-secondary: #6c757d;     /* Gray */
+    --color-success: #28a745;       /* Green */
+    --color-danger: #dc3545;        /* Red */
+    --color-background: #111827;    /* Dark Slate Background */
+    --color-surface: #1f2937;       /* Slightly lighter surface for cards/modals */
+    --color-text-light: #f3f4f6;    /* Light text */
+    --color-text-muted: #9ca3af;    /* Muted gray text */
+    
+    /* Spacing & Borders */
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+}
+
+/* ==========================================================
+   GLOBAL STYLES & LAYOUT
+   ========================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    color: var(--color-text-light);
+    background-color: var(--color-background);
+    height: 100%;
+    overflow: hidden; /* Prevent body scroll */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================
+   NAVIGATION
+   ========================================================== */
+
+nav {
+    width: 100%;
+    background-color: var(--color-surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ==========================================================
+   BUTTONS & CONTROLS
+   ========================================================== */
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.primary-btn {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+}
+
+.primary-btn:hover {
+    /* Slightly lighten primary color on hover */
+    background-color: color-mix(in srgb, var(--color-primary) 85%, white); 
+}
+
+.secondary-btn {
+    background-color: var(--color-surface);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-secondary);
+}
+
+.secondary-btn:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.actions button {
+    margin-left: var(--space-sm);
+}
+
+/* Control Panel at the bottom */
+#controlPanel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-md);
+    /* Subtle fade gradient to the bottom bar */
+    background: linear-gradient(to top, var(--color-surface), transparent); 
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    z-index: 20;
+}
+
+#controlPanel button {
+    width: 70px;
+    height: 70px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--color-surface);
+    color: var(--color-text-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid transparent;
+}
+
+#controlPanel button:hover {
+    background-color: color-mix(in srgb, var(--color-surface) 80%, black);
+    border-color: var(--color-primary);
+}
+
+
+
+#captureBtn {
+    background-color: white;
+    color: white;
+    border: 5px solid var(--color-surface);
+    width: 80px;
+    height: 80px;
+    /* Add transition for smooth effects */
+    transition: all 0.3s ease-in-out; 
+}
+
+/* --- CAPTURING ANIMATION START --- */
+
+/* Keyframes for the pulse effect */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7); /* var(--color-primary) */
+        transform: scale(1);
+    }
+    70% {
+        box-shadow: 0 0 0 20px rgba(13, 202, 240, 0);
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0);
+        transform: scale(1);
+    }
+}
+
+#captureBtn.is-capturing {
+    /* Apply the animation when the class is present */
+    animation: pulse 1.5s infinite;
+    cursor: wait;
+    /* Optionally change the color to red to indicate recording/busy */
+    background-color: var(--color-danger); 
+    border-color: var(--color-surface);
+}
+
+
+#captureBtn .material-symbols-outlined {
+    font-size: 40px;
+    color: var(--color-surface);
+}
+
+#flashBtn.is-flashing {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* ==========================================================
+   MAIN CAMERA VIEW & OVERLAY
+   ========================================================== */
+
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-md);
+    padding-bottom: 100px; /* Space for control panel */
+    width: 100%;
+}
+
+#cameraContainer {
+    position: relative;
+    width: 100%;
+    max-width: 1000px; /* Max size for desktop view */
+    aspect-ratio: 16 / 9; /* Common video aspect ratio */
+    overflow: hidden;
+    background-color: black;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#cameraView {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(1); /* Default transform for environment camera */
+}
+
+/* Flash effect */
+#flashOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s;
+    z-index: 15;
+}
+
+#flashOverlay.active {
+    opacity: 1;
+    transition: none; /* Instant on, quick fade off handled by JS */
+}
+
+/* ==========================================================
+   INFO OVERLAY (Geotag Element) - FIX FOR HORIZONTAL LAYOUT
+   ========================================================== */
+
+#infoOverlay {
+    position: absolute;
+    top: 50px; 
+    left: 50px;
+    
+    /* --- UI FIX START --- */
+    width: 100%; /* Set a fixed width for the combined element */
+    height: 150px; /* Set a fixed height */
+    display: flex; /* Use Flexbox for horizontal arrangement */
+    /* --- UI FIX END --- */
+
+    background: rgba(31, 41, 55, 0.85);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(#1b0101);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    resize: none; 
+    cursor: grab;
+    touch-action: none;
+    z-index: 18;
+    transition: box-shadow 0.2s;
+}
+
+#infoOverlay.is-interacting {
+    cursor: grabbing;
+    box-shadow: 0 0 15px var(--color-primary);
+}
+
+#infoOverlay.pointer-events-none {
+    pointer-events: none !important;
+}
+
+#overlayMap {
+    /* --- UI FIX START --- */
+    width: 40%; /* Map takes the left half */
+    height: 100%; /* Map takes full height of the overlay */
+    /* --- UI FIX END --- */
+    overflow: hidden;
+    /* Optional: Ensure Leaflet map tiles look sharp */
+    border-right: 1px solid var(--color-primary); 
+}
+
+.overlay-text {
+    /* --- UI FIX START --- */
+    width: 50%; /* Text info takes the right half */
+    /* --- UI FIX END --- */
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    /* Ensure text content fills its space vertically */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#overlayAddress {
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+}
+
+#overlayCoords, #overlayTime {
+    color: var(--color-text-light);
+}
+
+/* Handles for Dragging and Resizing - Positioned on the border for cleanliness */
+#dragHandle, #resizeHandle {
+    position: absolute;
+    color: var(--color-primary);
+    opacity: 0.8;
+    background: var(--color-surface);
+    padding: 4px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Smaller handles for better look */
+    width: 20px;
+    height: 20px;
+}
+
+#dragHandle .material-symbols-outlined, #resizeHandle .material-symbols-outlined {
+    font-size: 16px; /* Smaller icons */
+}
+
+#dragHandle {
+    /* Positioned on the top-left corner border */
+    top: 0px; 
+    left: 0px; 
+    cursor: grab;
+}
+
+#resizeHandle {
+    /* Positioned on the bottom-right corner border */
+    bottom: 0px; 
+    right: 0px; 
+    cursor: se-resize;
+}
+
+
+/* ==========================================================
+   MODALS (Preview & Manual Input)
+   ========================================================== */
+
+/* Universal modal overlay */
+#previewModal, #manualLocationModule {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#previewModal > div, #manualLocationModule > div {
+    background-color: var(--color-surface);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 600px;
+}
+
+#previewModal h2, #manualLocationModule h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+    font-size: 1.5rem;
+}
+
+.content-wrapper {
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-sm);
+    padding: var(--space-sm);
+    max-height: 60vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#previewImage {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Manual Location Specific */
+#manualMapPlaceholder {
+    height: 200px;
+    width: 100%;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--space-md);
+}
+
+.manual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.manual-grid label {
+    display: block;
+}
+
+.manual-grid input {
+    width: 100%;
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-secondary);
+    background-color: var(--color-background);
+    color: var(--color-text-light);
+}
+
+/* ==========================================================
+   LOGS MODULE
+   ========================================================== */
+
+#logsModule {
+    position: fixed;
+    top: 55px; /* Below navbar */
+    right: 0;
+    width: 300px;
+    height: calc(100vh - 55px - 100px); /* Adjust height for nav and control panel */
+    background-color: var(--color-surface);
+    border-left: 1px solid var(--color-secondary);
+    padding: var(--space-md);
+    z-index: 50;
+    transition: transform 0.3s ease-out;
+    transform: translateX(0); /* Default state (visible) */
+    display: flex;
+    flex-direction: column;
+}
+
+#logsModule.hidden {
+    transform: translateX(100%);
+    pointer-events: none;
+}
+
+#logsModule h6 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+}
+
+#logs {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 0.8rem;
+    padding: var(--space-sm);
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--space-md);
+}
+
+#logs div {
+    margin-bottom: 2px;
+    word-break: break-word;
+    color: var(--color-text-muted);
+}
+
+#logsModule .secondary-btn {
+    align-self: flex-start;
+}
+
+/* ==========================================================
+   TOAST NOTIFICATIONS
+   ========================================================== */
+
+#notificationContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+}
+.toast {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 300px;
+    opacity: 0; /* Handled by Animate.css via JS */
+}
+.toast.error { background-color: var(--color-danger); }
+.toast.success { background-color: var(--color-success); }
+.toast.info { background-color: var(--color-primary); }
+
+
+/* ==========================================================
+   UTILITY CLASSES & RESPONSIVENESS
+   ========================================================== */
+
+.hidden {
+    display: none !important;
+}
+
+/* Media Query for smaller screens (Mobile) */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+    }
+    
+    .actions button {
+        margin: 0;
+        flex-grow: 1;
+        padding: var(--space-sm) 0; /* Adjust vertical padding */
+    }
+    
+    main {
+        padding: var(--space-md);
+        padding-bottom: 120px;
+    }
+
+    #cameraContainer {
+        /* More common mobile aspect ratio */
+        aspect-ratio: 4 / 3; 
+    }
+
+    /* Reduce modal size slightly */
+    #previewModal > div, #manualLocationModule > div {
+        max-width: 95%;
+    }
+    
+    /* Logs module covers more screen space on mobile */
+    #logsModule {
+        width: 100%;
+        height: 60%;
+        top: 55px;
+        border-radius: 0;
+        border-left: none;
+    }
+    
+    /* Overlay adjustments for smaller screens */
+    #infoOverlay {
+        width: 100%;
+        max-width: 100%;
+        height: 160px;
+    }
+    #overlayMap {
+        height: 100%;
+    }
+    .overlay-text {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    /* Adjust control panel for better touch experience */
+    #controlPanel {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+    }
+    #captureBtn, #controlPanel button {
+        width: 65px;
+        height: 65px;
+    }
+    #captureBtn {
+        width: 75px;
+        height: 75px;
+    }
+}

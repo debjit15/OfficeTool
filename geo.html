@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoTag Pro: Precision Geotagging Tool</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" as="style">
+    <link rel="preload" href="https://fonts.gstatic.com/s/materialsymbolsoutlined/v173/XXX.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin="anonymous"/>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <link rel="stylesheet" href="./Assets/geo.css">
+
+    <style>
+        /* Define the Material Symbols icon style for consistent premium look */
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        }
+        
+        /* New styles for responsiveness and toast */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        #cameraContainer {
+            max-width: 100%;
+            height: 100%;
+        }
+        
+        /* Toast Notification Container */
+        #notificationContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+        .toast {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            opacity: 0;
+        }
+        .toast.error { background-color: #dc3545; }
+        .toast.success { background-color: #28a745; }
+        .toast.info { background-color: #0dcaf0; }
+        
+        /* Style for the new user profile in the overlay (CSS for .custom-user-marker is in geo.js) */
+        .user-details {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #overlayUserPhoto {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 8px;
+            object-fit: cover;
+            border: 1px solid #fff;
+        }
+        #overlayUsername {
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <div class="brand">
+                <span class="material-symbols-outlined">satellite_alt</span>
+                GeoTag Pro
+            </div>
+            <div class="actions">
+                <button id="fetchBtn" class="secondary-btn" title="Refresh GPS Coordinates">
+                    <span class="material-symbols-outlined">my_location</span>
+                    Fetch GPS
+                </button>
+                <button id="logBtn" class="secondary-btn" title="View System Activity Logs">
+                    <span class="material-symbols-outlined">article</span>
+                    Logs
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        
+        <div id="cameraContainer">
+            <video id="cameraView" autoplay playsinline></video>
+            <div id="flashOverlay"></div>
+
+            <div id="infoOverlay">
+                <div id="overlayMap"></div>
+                <div class="overlay-text">
+                    
+                    <div class="user-details">
+                        <img id="overlayUserPhoto" src="Assets/default-user.png" alt="User Photo">
+                        <div id="overlayUsername">Captured by: Guest</div>
+                    </div>
+                    <div id="overlayAddress">Fetching Address...</div>
+                    <div id="overlayCoords">Lat: ---, Lng: ---</div>
+                    <div id="overlayTime">Time: ---</div>
+                </div>
+                
+                <div id="dragHandle" title="Drag to move overlay">
+                    <span class="material-symbols-outlined">drag_indicator</span>
+                </div>
+                <div id="resizeHandle" title="Drag to resize overlay">
+                    <span class="material-symbols-outlined">crop_square</span>
+                </div>
+            </div>
+            
+        </div>
+        
+    </main>
+
+    <div id="controlPanel">
+        <button id="flashBtn" title="Toggle Flash">
+            <span class="material-symbols-outlined">flash_off</span>
+        </button>
+        <button id="captureBtn" title="Capture Photo with Geotag">
+            <span class="material-symbols-outlined">photo_camera</span>
+        </button>
+        <button id="rotateBtn" title="Flip Camera">
+            <span class="material-symbols-outlined">flip_camera_ios</span>
+        </button>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <div id="previewModal" class="hidden">
+        <div class="animate__animated">
+            <h2>Image Preview</h2>
+            <div class="content-wrapper">
+                <img id="previewImage" alt="Captured Geotagged Image">
+            </div>
+            <div class="action-buttons">
+                <button id="retakeBtn" class="secondary-btn" title="Discard and Retake">
+                    <span class="material-symbols-outlined">restart_alt</span> Retake
+                </button>
+                <button id="saveBtn" class="primary-btn" title="Download Image File">
+                    <span class="material-symbols-outlined">download</span> Save Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manualLocationModule" class="hidden">
+        <div class="animate__animated">
+            <h2>Manual Location Override</h2>
+            <div id="manualMapPlaceholder"></div>
+            
+            <div class="manual-grid">
+                <label>
+                    <div class="text-sm font-medium mb-1">Latitude</div>
+                    <input type="number" id="manualLatInput" step="0.000001" placeholder="e.g., 34.05223">
+                </label>
+                <label>
+                    <div class="text-sm font-medium mb-1">Longitude</div>
+                    <input type="number" id="manualLngInput" step="0.000001" placeholder="e.g., -118.24368">
+                </label>
+            </div>
+            
+            <div class="manual-grid">
+                <label>
+                    <div class="text-sm font-medium mb-1">Date</div>
+                    <input type="date" id="manualDateInput">
+                </label>
+                <label>
+                    <div class="text-sm font-medium mb-1">Time</div>
+                    <input type="time" id="manualTimeInput">
+                </label>
+            </div>
+
+            <div class="action-buttons mt-6">
+                <button id="manualCancelBtn" class="secondary-btn" title="Close and use automatic GPS">
+                    <span class="material-symbols-outlined">close</span> Cancel
+                </button>
+                <button id="manualConfirmBtn" class="primary-btn" title="Apply manual location and timestamp">
+                    <span class="material-symbols-outlined">check</span> Confirm Location
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logsModule" class="hidden">
+        <h6>System Logs</h6>
+        <div id="logs"></div>
+        <button id="closeLogs" class="secondary-btn">Close Logs</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    crossorigin="anonymous"></script>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin="anonymous"></script>
+        
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <script src="./Assets/geo.js"></script>
+
+</body>
+</html>
