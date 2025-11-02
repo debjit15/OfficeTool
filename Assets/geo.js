@@ -1,3 +1,5 @@
+
+
 const $cameraContainer = $('#cameraContainer');
 const $cameraView = $('#cameraView');
 const $captureBtn = $('#captureBtn');
@@ -18,7 +20,7 @@ const $overlayUsername = $('#overlayUsername');
 const $overlayUserPhoto = $('#overlayUserPhoto'); 
 const $overlay = $('#infoOverlay');
 
-const overlayMap = document.getElementById("overlayMap");
+const overlayMapElement = document.getElementById("overlayMap"); // Renamed to avoid conflict
 const dragHandle = document.getElementById("dragHandle"); 
 const resizeHandle = document.getElementById("resizeHandle");
 
@@ -49,12 +51,14 @@ let currentLng = 0;
 let currentTime = new Date();
 let currentUsername = 'Guest';
 let currentUserPhoto = 'Assets/default-user.png';
-
+let isPortrait = window.matchMedia("(orientation: portrait)").matches; // Initial orientation check
 
 const log = (msg) => {
     const time = new Date().toLocaleTimeString();
     const entry = `[${time}] ${msg}`;
     logs.push(entry);
+    // Keep only the last 50 logs to prevent performance issues
+    if (logs.length > 50) logs.shift(); 
     $logsContainer.html(logs.map(l => `<div>${l}</div>`).join(""));
     $logsContainer.scrollTop($logsContainer[0].scrollHeight);
 };
@@ -85,7 +89,7 @@ $flashBtn.on("click", () => {
 });
 
 const createUserIcon = (photoURL) => {
-    const fallbackLogo = './Assets/icons/icon-256x256.png';
+    const fallbackLogo = './Assets/icons/icon-256x256.png'; // Corrected path if needed
     let imageUrl = photoURL || fallbackLogo;
 
     const img = new Image();
@@ -99,11 +103,11 @@ const createUserIcon = (photoURL) => {
         className: 'custom-user-marker',
         html: `
             <div style="
-                background-color : white;
+                background-color : white; /* Ensures background if image is transparent */
                 background-image: url('${imageUrl}');
                 background-size: cover;
                 background-position: center;
-                border: 3px solid var(--color-primary);
+                border: 3px solid var(--primary-color); /* Changed to use CSS variable */
                 border-radius: 50%;
                 width: 32px;
                 height: 32px;
@@ -118,7 +122,7 @@ const createUserIcon = (photoURL) => {
 
 
 const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhoto) => {
-    const fallbackLogo = 'Assets/icons/icon-256x256.png';
+    const fallbackLogo = 'Assets/default-user.png'; // Changed to default-user.png from geo.html
 
     currentLat = lat;
     currentLng = lng;
@@ -138,7 +142,7 @@ const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhot
         $overlayUserPhoto.attr('src', currentUserPhoto);
 
         $overlayUserPhoto.off('error').on('error', function() {
-            console.warn(`⚠️ User photo failed to load, using app logo.`);
+            console.warn(`⚠️ User photo failed to load, using default.`);
             $(this).attr('src', fallbackLogo);
         });
     }
@@ -163,23 +167,19 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
 
     manualMarker = L.marker([initialLat, initialLng], { draggable: true }).addTo(manualMap);
     
-    // --- Current Location Button Implementation ---
-
-    // 1. Define the custom control (this uses Leaflet's pattern for custom buttons)
     L.Control.CurrentLocation = L.Control.extend({
         onAdd: function(map) {
             const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
             
-            // Set the button's appearance (e.g., using a location icon emoji or an icon class)
             container.style.backgroundColor = 'white';
-            container.style.width = '40px';
-            container.style.height = '40px';
+            container.style.width = '30px';
+            container.style.height = '30px';
             container.style.lineHeight = '30px';
             container.style.textAlign = 'center';
             container.style.cursor = 'pointer';
-            container.innerHTML = '📍'; // Location pin icon
+            container.style.fontSize = '18px'; // Make icon visible
+            container.innerHTML = '📍'; 
             
-            // 2. Add the click handler to call map.locate()
             container.onclick = function() {
                 map.locate({ setView: true, maxZoom: 16 });
             }
@@ -196,34 +196,27 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
         return new L.Control.CurrentLocation(opts);
     }
 
-    // Add the custom control to the map
     L.control.currentLocation({ position: 'topleft' }).addTo(manualMap);
 
-    // 3. Handle successful location finding
     manualMap.on('locationfound', (e) => {
         const { lat, lng } = e.latlng;
-        // Update the marker position
         manualMarker.setLatLng([lat, lng]); 
-        // Update the hidden input fields (assuming these are defined elsewhere)
         $manualLatInput.val(lat.toFixed(6));
         $manualLngInput.val(lng.toFixed(6));
-        // Add a circle to show the accuracy radius
         L.circle(e.latlng, e.accuracy, {
             weight: 1, 
             color: '#136AEC', 
             fillColor: '#136AEC', 
             fillOpacity: 0.2
         }).addTo(manualMap);
+        showToast("Device location found for manual input.", 'info');
     });
     
-    // 4. Handle location error
     manualMap.on('locationerror', (e) => {
         console.error("Location access denied or failed: " + e.message);
-        alert("Could not find your location. Please ensure location services are enabled.");
+        showToast("Could not find your location. Please ensure location services are enabled.", 'error');
     });
 
-    // --- Original Event Handlers ---
-    
     manualMarker.on('dragend', (e) => {
         const { lat, lng } = e.target.getLatLng();
         $manualLatInput.val(lat.toFixed(6));
@@ -291,8 +284,8 @@ const processManualLocation = async () => {
 const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) => {
     let addressHTML = "Fetching address...";
 
-    const username = localStorage.getItem('userName') || 'Guest User';
-    const userPhoto = localStorage.getItem('userPhoto') || 'Assets/icons/icon-256x256.png';
+    const username = localStorage.getItem('userDisplayName') || 'Guest'; // Defaulting to 'Guest'
+    const userPhoto = localStorage.getItem('userPhotoURL') || 'Assets/default-user.png'; // Defaulting to default-user.png
     const userIcon = createUserIcon(userPhoto);
 
     try {
@@ -377,7 +370,7 @@ const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) =
 
     const initialZoom = 17;
     if (!map) {
-        map = L.map(overlayMap, {
+        map = L.map(overlayMapElement, { // Use the renamed element here
             zoomControl: false,
             attributionControl: false,
             dragging: false,
@@ -402,7 +395,7 @@ const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) =
         }
     }
 
-
+    // Force map redraw to fix tile issues after resize/reposition
     setTimeout(() => map.invalidateSize(true), 500);
     locationFailures = 0;
 };
@@ -412,16 +405,30 @@ async function startCamera() {
         currentStream.getTracks().forEach(track => track.stop());
     }
     try {
+        // Request higher resolution for better geotagging quality
         const constraints = {
-            video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+            video: { 
+                facingMode, 
+                width: { ideal: 1920 }, // Increased ideal width
+                height: { ideal: 1080 } // Increased ideal height
+            },
             audio: false
         };
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         $cameraView[0].srcObject = currentStream;
         log(`Camera started (${facingMode}).`);
+
+        // Set the CSS variable for mirroring based on facingMode
+        if (facingMode === "user") {
+            $cameraView.css('--camera-scaleX', '-1'); // Flip horizontally for selfie cam
+        } else {
+            $cameraView.css('--camera-scaleX', '1'); // Normal for environment cam
+        }
+
     } catch (err) {
-        log(`Camera error: ${err.message}`);
-        showToast("Unable to access camera. Check permissions.", 'error');
+        log(`Camera error: ${err.name} - ${err.message}`);
+        showToast("Unable to access camera. Check permissions and try again.", 'error');
+        // Fallback to manual input if camera fails to start repeatedly?
     }
 }
 
@@ -434,13 +441,13 @@ const mapToImage = () => {
     return new Promise((resolve, reject) => {
         if (!map) return resolve(null);
         
-        const controls = overlayMap.querySelectorAll('.leaflet-control-container, .leaflet-control');
+        const controls = overlayMapElement.querySelectorAll('.leaflet-control-container, .leaflet-control');
         controls.forEach(c => c.style.visibility = 'hidden');
         
         const markerIcon = mapMarker?._icon;
         if (markerIcon) markerIcon.style.visibility = 'visible';
 
-        html2canvas(overlayMap, {
+        html2canvas(overlayMapElement, { // Use renamed element
             allowTaint: true,
             useCORS: true,
             scale: 2, 
@@ -473,6 +480,7 @@ $captureBtn.on("click", async () => {
 
         $overlay.css('visibility', 'visible');
 
+        // Temporarily hide drag/resize handles and UI elements before capture
         if (dragHandle) dragHandle.style.visibility = 'hidden';
         if (resizeHandle) resizeHandle.style.visibility = 'hidden';
 
@@ -480,9 +488,9 @@ $captureBtn.on("click", async () => {
         let mapElementPlaceholder = []; 
 
         if (mapImageElement) {
-            mapElementPlaceholder = Array.from(overlayMap.children);
-            overlayMap.innerHTML = '';
-            overlayMap.appendChild(mapImageElement);
+            mapElementPlaceholder = Array.from(overlayMapElement.children); // Use renamed element
+            overlayMapElement.innerHTML = '';
+            overlayMapElement.appendChild(mapImageElement);
         }
         
         const logsWasOpen = !$logsModule.hasClass('hidden');
@@ -491,6 +499,9 @@ $captureBtn.on("click", async () => {
         $('#controlPanel').css('visibility', 'hidden'); 
         $('nav').css('visibility', 'hidden'); 
 
+        // Use a slight delay to ensure all CSS visibility changes are applied
+        await new Promise(resolve => setTimeout(resolve, 50)); 
+
         const canvas = await html2canvas($cameraContainer[0], {
             allowTaint: true,
             useCORS: true, 
@@ -498,9 +509,10 @@ $captureBtn.on("click", async () => {
             removeContainer: true,
         });
 
+        // Restore map elements and UI visibility
         if (mapImageElement && mapElementPlaceholder.length > 0) {
-            overlayMap.innerHTML = '';
-            mapElementPlaceholder.forEach(child => overlayMap.appendChild(child));
+            overlayMapElement.innerHTML = '';
+            mapElementPlaceholder.forEach(child => overlayMapElement.appendChild(child));
             map.invalidateSize();
         }
 
@@ -520,7 +532,7 @@ $captureBtn.on("click", async () => {
         $previewModal.find('> div').removeClass('animate__fadeOutDown').addClass('animate__zoomIn');
         
         log("Preview modal displayed.");
-        $overlay.addClass('pointer-events-none'); 
+        $overlay.addClass('pointer-events-none'); // Prevent interaction with overlay behind modal
 
     } catch (err) {
         log("Capture error: " + err.message);
@@ -536,7 +548,7 @@ const closeModalAndReenable = (element) => {
     element.on('animationend', function() {
         if ($(this).find('> div').hasClass('animate__fadeOutDown')) {
             $(this).addClass('hidden');
-            $(this).off('animationend');
+            $(this).off('animationend'); // Remove listener after animation
         }
     });
     $overlay.removeClass('pointer-events-none');
@@ -562,6 +574,7 @@ $retakeBtn.on("click", () => {
 async function fetchLocation() {
     if (!navigator.geolocation) {
         showToast("Geolocation not supported by this browser.", 'error');
+        log("Geolocation not supported.");
         return;
     }
 
@@ -583,11 +596,11 @@ async function fetchLocation() {
         const { latitude, longitude } = pos.coords;
         
         await reverseGeocodeAndRender(latitude, longitude, new Date());
-        showToast("Location updated successfully.", 'info');
+        showToast("Location updated successfully.", 'success'); // Changed to success for good UX
 
     } catch (err) {
         locationFailures++;
-        log(`Geolocation failed (Attempt ${locationFailures}/3).`);
+        log(`Geolocation failed (Attempt ${locationFailures}/3): ${err.message}`);
 
         const errorMsg = err.code === 1
             ? "🛑 Permission denied. Please enable location services."
@@ -630,29 +643,42 @@ $manualLngInput.on('input', updateMapFromManualInputs);
 
 $('nav #logBtn').on("click", () => {
     $logsModule.toggleClass("hidden");
+    if (!$logsModule.hasClass('hidden')) {
+        $logsContainer.scrollTop($logsContainer[0].scrollHeight); // Scroll to bottom when opening
+    }
 });
 
 $closeLogs.on("click", () => $logsModule.addClass("hidden"));
 
+// =========================================
+// Overlay Drag & Resize Logic (Modified for Responsiveness)
+// =========================================
 let drag = false, resize = false, startX, startY;
 const getCoords = (e) => e.touches ? e.touches[0] : e;
 let offsetX = 0;
 let offsetY = 0;
-let containerRect;
+let containerRect; // Store camera container dimensions
+let overlayInitialWidth, overlayInitialHeight; // Store initial overlay size for resize calculations
 
 const startInteraction = (e) => {
     if (!$previewModal.hasClass('hidden') || !$manualLocationModule.hasClass('hidden')) return;
     
     e.preventDefault(); 
+    e.stopPropagation(); // Stop propagation to prevent accidental camera view interaction
     
     containerRect = $cameraContainer[0].getBoundingClientRect(); 
     const targetId = e.currentTarget.id;
 
     if (targetId === "resizeHandle") {
+        // Check if resize handle is displayed by CSS (e.g., hidden on small portrait)
         if (window.getComputedStyle(resizeHandle).display === 'none') return; 
         resize = true;
         drag = false;
+        overlayInitialWidth = $overlay.outerWidth();
+        overlayInitialHeight = $overlay.outerHeight();
     } else if (targetId === "dragHandle" || e.currentTarget === $overlay[0]) {
+        // Check if drag handle is displayed by CSS (e.g., hidden on small portrait)
+        if (targetId === "dragHandle" && window.getComputedStyle(dragHandle).display === 'none') return;
         drag = true;
         resize = false;
     } else {
@@ -662,8 +688,9 @@ const startInteraction = (e) => {
     const { clientX, clientY } = getCoords(e);
     
     if (drag) {
-        offsetX = clientX - $overlay[0].offsetLeft;
-        offsetY = clientY - $overlay[0].offsetTop;
+        const overlayOffset = $overlay.offset(); // Get current position relative to document
+        offsetX = clientX - overlayOffset.left;
+        offsetY = clientY - overlayOffset.top;
     } else if (resize) {
         startX = clientX;
         startY = clientY;
@@ -674,7 +701,8 @@ const startInteraction = (e) => {
 
 $overlay.on("mousedown touchstart", "#dragHandle, #resizeHandle", startInteraction);
 $overlay.on("mousedown touchstart", (e) => {
-    if (e.target.id === 'infoOverlay') {
+    // Only allow drag if clicking directly on the overlay AND not on a handle
+    if (e.target === $overlay[0]) {
         startInteraction(e);
     }
 });
@@ -684,6 +712,7 @@ $(document).on("mousemove touchmove", (e) => {
     if (!drag && !resize) return;
     
     e.preventDefault(); 
+    e.stopPropagation(); 
     
     const { clientX, clientY } = getCoords(e);
     
@@ -691,9 +720,11 @@ $(document).on("mousemove touchmove", (e) => {
         let newLeft = clientX - offsetX;
         let newTop = clientY - offsetY;
 
-        newLeft = Math.max(0, Math.min(newLeft, containerRect.width - $overlay.outerWidth()));
-        newTop = Math.max(0, Math.min(newTop, containerRect.height - $overlay.outerHeight()));
-
+        // Constrain overlay within cameraContainer boundaries
+        newLeft = Math.max(containerRect.left, Math.min(newLeft, containerRect.right - $overlay.outerWidth()));
+        newTop = Math.max(containerRect.top, Math.min(newTop, containerRect.bottom - $overlay.outerHeight()));
+        
+        // Convert page coordinates to relative to body/viewport for positioning
         $overlay.css({ left: `${newLeft}px`, top: `${newTop}px` });
 
     } else if (resize) {
@@ -703,20 +734,25 @@ $(document).on("mousemove touchmove", (e) => {
         let currentWidth = $overlay.outerWidth();
         let currentHeight = $overlay.outerHeight();
 
-        const MIN_WIDTH = 300; 
-        const MIN_HEIGHT = 150; 
+        const MIN_WIDTH = 200; // Adjusted min width
+        const MIN_HEIGHT = 120; // Adjusted min height (matching small screen map height)
 
-        const newWidth = Math.max(MIN_WIDTH, currentWidth + dx);
-        const newHeight = Math.max(MIN_HEIGHT, currentHeight + dy);
+        let newWidth = overlayInitialWidth + dx;
+        let newHeight = overlayInitialHeight + dy;
         
-        const maxPossibleWidth = containerRect.width - $overlay[0].offsetLeft;
-        const maxPossibleHeight = containerRect.height - $overlay[0].offsetTop;
+        // Max width/height based on container and current position
+        const maxPossibleWidth = containerRect.right - $overlay.offset().left;
+        const maxPossibleHeight = containerRect.bottom - $overlay.offset().top;
+
+        newWidth = Math.max(MIN_WIDTH, Math.min(newWidth, maxPossibleWidth));
+        newHeight = Math.max(MIN_HEIGHT, Math.min(newHeight, maxPossibleHeight));
 
         $overlay.css({ 
-            width: `${Math.min(newWidth, maxPossibleWidth)}px`, 
-            height: `${Math.min(newHeight, maxPossibleHeight)}px` 
+            width: `${newWidth}px`, 
+            height: `${newHeight}px` 
         });
 
+        // Update startX, startY for continuous resizing
         startX = clientX;
         startY = clientY;
         
@@ -739,27 +775,51 @@ $(document).on("mouseup touchend touchcancel", () => {
     }
 });
 
+
+// =========================================
+// Orientation / Resize Handling
+// =========================================
 let orientationTimer;
+
+const applyOrientationClass = () => {
+    isPortrait = window.matchMedia("(orientation: portrait)").matches;
+    if (isPortrait) {
+        $('body').removeClass('landscape-mode').addClass('portrait-mode');
+        log("Orientation: Portrait Mode.");
+    } else {
+        $('body').removeClass('portrait-mode').addClass('landscape-mode');
+        log("Orientation: Landscape Mode.");
+    }
+    
+    // Recalculate containerRect after orientation change
+    containerRect = $cameraContainer[0].getBoundingClientRect();
+
+    // Reset overlay position to default (bottom-right/bottom-left based on mode)
+    // The CSS media queries will handle the default placement for different orientations/sizes.
+    // If you need more precise JS control, you'd add specific logic here.
+    $overlay.attr('style', ''); // Clear inline style set by JS dragging/resizing
+
+    // Force map redraw in main overlay and manual map
+    if (map) {
+        setTimeout(() => map.invalidateSize(true), 100);
+    }
+    if (manualMap && !$manualLocationModule.hasClass('hidden')) {
+        setTimeout(() => manualMap.invalidateSize(true), 100);
+    }
+};
+
+// Listen for orientation changes
+window.matchMedia("(orientation: portrait)").addEventListener("change", (e) => {
+    clearTimeout(orientationTimer);
+    orientationTimer = setTimeout(applyOrientationClass, 100);
+});
+
+// Also trigger on window resize, as orientation might not always trigger 'change' on desktop browsers
 $(window).on('resize', () => {
     clearTimeout(orientationTimer);
-    orientationTimer = setTimeout(() => {
-        log("Device orientation changed. Adjusting overlay and map.");
-
-        containerRect = $cameraContainer[0].getBoundingClientRect();
-        
-        let currentLeft = $overlay[0].offsetLeft;
-        let currentTop = $overlay[0].offsetTop;
-        
-        let newLeft = Math.max(0, Math.min(currentLeft, containerRect.width - $overlay.outerWidth()));
-        let newTop = Math.max(0, Math.min(currentTop, containerRect.height - $overlay.outerHeight()));
-
-        $overlay.css({ left: `${newLeft}px`, top: `${newTop}px` });
-
-        if (map) {
-            map.invalidateSize(true);
-        }
-    }, 300);
+    orientationTimer = setTimeout(applyOrientationClass, 100);
 });
+
 
 const loadLastLocation = () => {
     const lastLat = parseFloat(localStorage.getItem('lastLat'));
@@ -775,7 +835,9 @@ const loadLastLocation = () => {
 
 $(document).ready(() => {
     log("Initializing GeoTag Pro...");
+    applyOrientationClass(); // Set initial orientation class on load
     loadLastLocation();
     startCamera();
     fetchLocation();
 });
+

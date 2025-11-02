@@ -1,25 +1,21 @@
-:root {
-    /* Color Palette */
-    --color-primary: #0dcaf0;       /* Cyan/Info Blue */
-    --color-secondary: #6c757d;     /* Gray */
-    --color-success: #28a745;       /* Green */
-    --color-danger: #dc3545;        /* Red */
-    --color-background: #111827;    /* Dark Slate Background */
-    --color-surface: #1f2937;       /* Slightly lighter surface for cards/modals */
-    --color-text-light: #f3f4f6;    /* Light text */
-    --color-text-muted: #9ca3af;    /* Muted gray text */
-    
-    /* Spacing & Borders */
-    --space-sm: 8px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-}
 
-/* ==========================================================
-   GLOBAL STYLES & LAYOUT
-   ========================================================== */
+
+/* Base Styles */
+:root {
+    --primary-color: #4CAF50; /* Green */
+    --secondary-color: #03A9F4; /* Light Blue */
+    --accent-color: #FFC107; /* Amber */
+    --text-color: #333;
+    --text-light: #f4f4f4;
+    --text-light-gray: rgba(255, 255, 255, 0.7);
+    --bg-dark: #222;
+    --bg-light: #f0f2f5;
+    --border-color: #ddd;
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+    --button-padding: 10px 15px;
+    --border-radius: 8px;
+    --shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
 
 * {
     box-sizing: border-box;
@@ -28,206 +24,143 @@
 }
 
 html, body {
-    font-family: 'Inter', sans-serif;
-    color: var(--color-text-light);
-    background-color: var(--color-background);
-    height: 100%;
-    overflow: hidden; /* Prevent body scroll */
+    height: 100%; /* Ensure html and body take full height */
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling on main body */
 }
 
 body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-dark); /* Dark background for the app chrome */
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-/* ==========================================================
-   NAVIGATION
-   ========================================================== */
+/* Material Symbols Icon Style */
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+    vertical-align: middle;
+    font-size: 1.2em;
+}
 
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+h6 {
+    font-size: 1.1em;
+}
+p.text-xs {
+    font-size: 0.75rem;
+}
+p.text-light-gray {
+    color: var(--text-light-gray);
+}
+
+
+/* Buttons */
+button {
+    cursor: pointer;
+    border: none;
+    padding: var(--button-padding);
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+button .material-symbols-outlined {
+    font-size: 1.1em;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    box-shadow: var(--shadow);
+}
+.primary-btn:hover {
+    background-color: #388E3C; /* Darken primary color */
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.secondary-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Navigation Bar */
 nav {
-    width: 100%;
-    background-color: var(--color-surface);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 1000; /* Ensure nav is above other content */
+    flex-shrink: 0; /* Prevent nav from shrinking */
 }
-
 .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-md) var(--space-lg);
     max-width: 1200px;
     margin: 0 auto;
 }
-
 .brand {
-    font-size: 1.5rem;
+    font-size: 1.4em;
     font-weight: 700;
-    color: var(--color-primary);
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 8px;
 }
-
-/* ==========================================================
-   BUTTONS & CONTROLS
-   ========================================================== */
-
-button {
-    cursor: pointer;
-    border: none;
-    border-radius: var(--border-radius-md);
-    padding: var(--space-sm) var(--space-md);
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.primary-btn {
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-}
-
-.primary-btn:hover {
-    /* Slightly lighten primary color on hover */
-    background-color: color-mix(in srgb, var(--color-primary) 85%, white); 
-}
-
-.secondary-btn {
-    background-color: var(--color-surface);
-    color: var(--color-text-light);
-    border: 1px solid var(--color-secondary);
-}
-
-.secondary-btn:hover {
-    background-color: var(--color-secondary);
-    border-color: var(--color-secondary);
-}
-
-.actions button {
-    margin-left: var(--space-sm);
-}
-
-/* Control Panel at the bottom */
-#controlPanel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: var(--space-md);
-    /* Subtle fade gradient to the bottom bar */
-    background: linear-gradient(to top, var(--color-surface), transparent); 
+.actions {
     display: flex;
-    justify-content: center;
-    gap: var(--space-lg);
-    z-index: 20;
+    gap: 10px;
 }
 
-#controlPanel button {
-    width: 70px;
-    height: 70px;
-    padding: 0;
-    border-radius: 50%;
-    background-color: var(--color-surface);
-    color: var(--color-text-light);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 3px solid transparent;
-}
-
-#controlPanel button:hover {
-    background-color: color-mix(in srgb, var(--color-surface) 80%, black);
-    border-color: var(--color-primary);
-}
-
-
-
-#captureBtn {
-    background-color: white;
-    color: white;
-    border: 5px solid var(--color-surface);
-    width: 80px;
-    height: 80px;
-    /* Add transition for smooth effects */
-    transition: all 0.3s ease-in-out; 
-}
-
-/* --- CAPTURING ANIMATION START --- */
-
-/* Keyframes for the pulse effect */
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7); /* var(--color-primary) */
-        transform: scale(1);
-    }
-    70% {
-        box-shadow: 0 0 0 20px rgba(13, 202, 240, 0);
-        transform: scale(1.05);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0);
-        transform: scale(1);
-    }
-}
-
-#captureBtn.is-capturing {
-    /* Apply the animation when the class is present */
-    animation: pulse 1.5s infinite;
-    cursor: wait;
-    /* Optionally change the color to red to indicate recording/busy */
-    background-color: var(--color-danger); 
-    border-color: var(--color-surface);
-}
-
-
-#captureBtn .material-symbols-outlined {
-    font-size: 40px;
-    color: var(--color-surface);
-}
-
-#flashBtn.is-flashing {
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-/* ==========================================================
-   MAIN CAMERA VIEW & OVERLAY
-   ========================================================== */
-
+/* Main Content Area */
 main {
     flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: var(--space-md);
-    padding-bottom: 100px; /* Space for control panel */
-    width: 100%;
-}
-
-#cameraContainer {
     position: relative;
-    width: 100%;
-    max-width: 1000px; /* Max size for desktop view */
-    aspect-ratio: 16 / 9; /* Common video aspect ratio */
-    overflow: hidden;
-    background-color: black;
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden; /* Important for video scaling */
+    padding: 0; /* Remove padding here, cameraContainer will handle it */
 }
 
+/* Camera Container */
+#cameraContainer {
+    position: absolute; /* Allows it to fill main, but be within its flow */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000; /* Black background behind video */
+}
 #cameraView {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transform: scaleX(1); /* Default transform for environment camera */
+    object-fit: cover; /* This is key for full-screen video */
+    transform: scaleX(var(--camera-scaleX, 1)); /* Default: no mirror */
+    z-index: 1; /* Below overlay */
 }
-
-/* Flash effect */
 #flashOverlay {
     position: absolute;
     top: 0;
@@ -237,264 +170,166 @@ main {
     background-color: white;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.1s;
-    z-index: 15;
+    transition: opacity 0.1s ease-out;
+    z-index: 5;
 }
-
 #flashOverlay.active {
     opacity: 1;
-    transition: none; /* Instant on, quick fade off handled by JS */
 }
 
-/* ==========================================================
-   INFO OVERLAY (Geotag Element) - FIX FOR HORIZONTAL LAYOUT
-   ========================================================== */
-
+/* Info Overlay */
 #infoOverlay {
     position: absolute;
-    top: 50px; 
-    left: 50px;
-    
-    /* --- UI FIX START --- */
-    width: 100%; /* Set a fixed width for the combined element */
-    height: 150px; /* Set a fixed height */
-    display: flex; /* Use Flexbox for horizontal arrangement */
-    /* --- UI FIX END --- */
-
-    background: rgba(31, 41, 55, 0.85);
-    backdrop-filter: blur(5px);
-    border: 2px solid var(#1b0101);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    resize: none; 
-    cursor: grab;
-    touch-action: none;
-    z-index: 18;
-    transition: box-shadow 0.2s;
+    bottom: 20px;
+    right: 20px;
+    width: 280px;
+    background-color: var(--overlay-bg);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    color: var(--text-light);
+    box-shadow: var(--shadow);
+    z-index: 10;
+    resize: both; /* Allow manual resize */
+    overflow: auto; /* Allow scroll if content overflows */
+    min-width: 200px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    /* Use 'translate' for positioning if possible to avoid reflows, but 'left/top' is more direct for drag/drop */
 }
-
 #infoOverlay.is-interacting {
     cursor: grabbing;
-    box-shadow: 0 0 15px var(--color-primary);
 }
-
 #infoOverlay.pointer-events-none {
-    pointer-events: none !important;
+    pointer-events: none; /* Used when modals are open */
 }
 
 #overlayMap {
-    /* --- UI FIX START --- */
-    width: 40%; /* Map takes the left half */
-    height: 100%; /* Map takes full height of the overlay */
-    /* --- UI FIX END --- */
-    overflow: hidden;
-    /* Optional: Ensure Leaflet map tiles look sharp */
-    border-right: 1px solid var(--color-primary); 
+    width: 100%;
+    height: 120px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden; /* Ensure map tiles don't overflow */
+    flex-shrink: 0; /* Prevent map from shrinking in vertical flex */
 }
-
 .overlay-text {
-    /* --- UI FIX START --- */
-    width: 50%; /* Text info takes the right half */
-    /* --- UI FIX END --- */
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    line-height: 1.3;
-    /* Ensure text content fills its space vertically */
+    flex-grow: 1; /* Allows text to take remaining space */
+}
+.overlay-text > div {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+.user-details {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+#overlayUserPhoto {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+    object-fit: cover;
+    border: 1px solid #fff;
+}
+#overlayUsername {
+    font-size: 0.85em;
+    font-weight: 500;
+}
+.pin-code {
+    font-weight: bold;
+    color: var(--accent-color);
 }
 
-#overlayAddress {
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: 4px;
-}
 
-#overlayCoords, #overlayTime {
-    color: var(--color-text-light);
-}
-
-/* Handles for Dragging and Resizing - Positioned on the border for cleanliness */
+/* Drag and Resize Handles */
 #dragHandle, #resizeHandle {
     position: absolute;
-    color: var(--color-primary);
-    opacity: 0.8;
-    background: var(--color-surface);
-    padding: 4px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 20;
+    color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    /* Smaller handles for better look */
-    width: 20px;
-    height: 20px;
+    cursor: grab;
+    transition: background-color 0.2s;
+    z-index: 11; /* Above the overlay content */
 }
-
-#dragHandle .material-symbols-outlined, #resizeHandle .material-symbols-outlined {
-    font-size: 16px; /* Smaller icons */
+#dragHandle:hover, #resizeHandle:hover {
+    background-color: rgba(0, 0, 0, 0.5);
 }
-
 #dragHandle {
-    /* Positioned on the top-left corner border */
-    top: 0px; 
-    left: 0px; 
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
     cursor: grab;
 }
-
 #resizeHandle {
-    /* Positioned on the bottom-right corner border */
-    bottom: 0px; 
-    right: 0px; 
-    cursor: se-resize;
+    bottom: -12px;
+    right: -12px;
+    cursor: nwse-resize;
 }
 
-
-/* ==========================================================
-   MODALS (Preview & Manual Input)
-   ========================================================== */
-
-/* Universal modal overlay */
-#previewModal, #manualLocationModule {
+/* Control Panel */
+#controlPanel {
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--bg-dark);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-around; /* Distribute items evenly */
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
     z-index: 1000;
+    flex-shrink: 0; /* Prevent control panel from shrinking */
+}
+#controlPanel button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    padding: 10px;
+    font-size: 1.8em; /* Larger icons for controls */
+    opacity: 0.8;
+}
+#controlPanel button:hover {
+    opacity: 1;
+    color: var(--primary-color);
+}
+#captureBtn {
+    font-size: 3em; /* Extra large for capture button */
+    color: var(--primary-color);
+    border: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    min-width: 70px; /* Ensure it doesn't shrink */
+    min-height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 0 15px rgba(var(--primary-color), 0.5);
+    margin: 0 10px; /* Space around the main capture button */
+}
+#captureBtn:hover {
+    background-color: rgba(var(--primary-color), 0.1);
+}
+#captureBtn.is-capturing {
+    animation: pulse 0.5s infinite alternate;
+}
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); box-shadow: 0 0 20px rgba(var(--primary-color), 0.8); }
 }
 
-#previewModal > div, #manualLocationModule > div {
-    background-color: var(--color-surface);
-    padding: var(--space-lg);
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    width: 90%;
-    max-width: 600px;
-}
 
-#previewModal h2, #manualLocationModule h2 {
-    color: var(--color-primary);
-    margin-bottom: var(--space-md);
-    font-size: 1.5rem;
-}
-
-.content-wrapper {
-    background-color: var(--color-background);
-    border-radius: var(--border-radius-sm);
-    padding: var(--space-sm);
-    max-height: 60vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#previewImage {
-    max-width: 100%;
-    max-height: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-sm);
-    margin-top: var(--space-lg);
-}
-
-/* Manual Location Specific */
-#manualMapPlaceholder {
-    height: 200px;
-    width: 100%;
-    border-radius: var(--border-radius-sm);
-    margin-bottom: var(--space-md);
-}
-
-.manual-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
-}
-
-.manual-grid label {
-    display: block;
-}
-
-.manual-grid input {
-    width: 100%;
-    padding: var(--space-sm);
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--color-secondary);
-    background-color: var(--color-background);
-    color: var(--color-text-light);
-}
-
-/* ==========================================================
-   LOGS MODULE
-   ========================================================== */
-
-#logsModule {
-    position: fixed;
-    top: 55px; /* Below navbar */
-    right: 0;
-    width: 300px;
-    height: calc(100vh - 55px - 100px); /* Adjust height for nav and control panel */
-    background-color: var(--color-surface);
-    border-left: 1px solid var(--color-secondary);
-    padding: var(--space-md);
-    z-index: 50;
-    transition: transform 0.3s ease-out;
-    transform: translateX(0); /* Default state (visible) */
-    display: flex;
-    flex-direction: column;
-}
-
-#logsModule.hidden {
-    transform: translateX(100%);
-    pointer-events: none;
-}
-
-#logsModule h6 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: var(--space-sm);
-}
-
-#logs {
-    flex-grow: 1;
-    overflow-y: auto;
-    font-size: 0.8rem;
-    padding: var(--space-sm);
-    background-color: var(--color-background);
-    border-radius: var(--border-radius-sm);
-    margin-bottom: var(--space-md);
-}
-
-#logs div {
-    margin-bottom: 2px;
-    word-break: break-word;
-    color: var(--color-text-muted);
-}
-
-#logsModule .secondary-btn {
-    align-self: flex-start;
-}
-
-/* ==========================================================
-   TOAST NOTIFICATIONS
-   ========================================================== */
-
+/* Toast Notification Container */
 #notificationContainer {
     position: fixed;
     top: 20px;
@@ -508,90 +343,519 @@ main {
     color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: 300px;
-    opacity: 0; /* Handled by Animate.css via JS */
+    opacity: 0;
 }
-.toast.error { background-color: var(--color-danger); }
-.toast.success { background-color: var(--color-success); }
-.toast.info { background-color: var(--color-primary); }
+.toast.error { background-color: #dc3545; }
+.toast.success { background-color: #28a745; }
+.toast.info { background-color: #0dcaf0; }
 
-
-/* ==========================================================
-   UTILITY CLASSES & RESPONSIVENESS
-   ========================================================== */
-
+/* Modals (Preview, Manual Location, Logs, Settings, Gallery) */
 .hidden {
     display: none !important;
 }
+#previewModal, #manualLocationModule, #logsModule, #settingsModule, #galleryModule {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+#previewModal > div,
+#manualLocationModule > div,
+#logsModule > div,
+#settingsModule > div,
+#galleryModule > div {
+    background-color: var(--bg-dark);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-light);
+}
 
-/* Media Query for smaller screens (Mobile) */
+#previewModal h2, #manualLocationModule h2, #logsModule h6, #settingsModule h2, #galleryModule h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-light);
+}
+
+#previewImage {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    object-fit: contain;
+}
+.content-wrapper {
+    flex-grow: 1; /* Allows image to take available height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+}
+.action-buttons button {
+    flex-grow: 1; /* Allows buttons to expand */
+    min-width: 120px; /* Ensure a minimum width */
+}
+
+
+#manualMapPlaceholder {
+    width: 100%;
+    height: 200px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+.manual-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.manual-grid label {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-light);
+}
+.manual-grid input[type="number"],
+.manual-grid input[type="date"],
+.manual-grid input[type="time"] {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    font-size: 1em;
+    width: 100%;
+}
+.manual-grid input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+/* Style for date/time input dropdown arrows */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the icon white */
+}
+
+
+#logs {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+#closeLogs {
+    display: block;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+/* Settings Module Specific Styles */
+#settingsModule .settings-section {
+    margin-bottom: 20px;
+}
+#settingsModule label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    color: var(--text-light);
+}
+#settingsModule input[type="text"],
+#settingsModule input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    font-size: 1em;
+}
+#settingsModule input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+
+/* Gallery Module Specific Styles */
+#galleryContent {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+    gap: 10px;
+    max-height: 500px; /* Limit height and allow scroll */
+    overflow-y: auto;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+#galleryContent img {
+    width: 100px; /* Fixed width for thumbnails */
+    height: 100px; /* Fixed height for thumbnails */
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+}
+#galleryContent img:hover {
+    transform: scale(1.05);
+}
+#galleryContent p {
+    grid-column: 1 / -1; /* Center message */
+    text-align: center;
+    padding: 20px;
+}
+
+
+/* Custom User Marker for Leaflet (from original geo.js comment) */
+.custom-user-marker {
+    background-color: var(--primary-color); /* This is the background of the divIcon */
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+}
+/* The actual image or content is inside a div within this */
+.custom-user-marker > div {
+    /* Styles are mostly inline in JS, but could be here too */
+}
+
+
+/* ========================================= */
+/*       RESPONSIVENESS & ORIENTATION        */
+/* ========================================= */
+
+/* General Small Screen Adjustments (Max-width 768px) */
 @media (max-width: 768px) {
-    .nav-container {
-        flex-direction: column;
-        gap: var(--space-sm);
-        padding: var(--space-sm) var(--space-md);
+    nav {
+        padding: 10px 15px;
     }
-    
-    .actions {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
+    .brand {
+        font-size: 1.2em;
     }
-    
-    .actions button {
-        margin: 0;
-        flex-grow: 1;
-        padding: var(--space-sm) 0; /* Adjust vertical padding */
+    .nav-container .actions {
+        gap: 5px;
     }
-    
-    main {
-        padding: var(--space-md);
-        padding-bottom: 120px;
+    .nav-container .actions button {
+        padding: 8px 10px;
+    }
+    .nav-container .actions .button-text {
+        display: none; /* Hide text on small screens, keep icons */
     }
 
-    #cameraContainer {
-        /* More common mobile aspect ratio */
-        aspect-ratio: 4 / 3; 
-    }
-
-    /* Reduce modal size slightly */
-    #previewModal > div, #manualLocationModule > div {
-        max-width: 95%;
-    }
-    
-    /* Logs module covers more screen space on mobile */
-    #logsModule {
-        width: 100%;
-        height: 60%;
-        top: 55px;
-        border-radius: 0;
-        border-left: none;
-    }
-    
-    /* Overlay adjustments for smaller screens */
+    /* Info Overlay - make it smaller and position differently */
     #infoOverlay {
-        width: 100%;
-        max-width: 100%;
-        height: 160px;
+        width: calc(100% - 40px); /* Full width minus margin */
+        bottom: 80px; /* Above control panel */
+        right: 20px;
+        left: 20px; /* Center it */
+        transform: none; /* Reset transform if any from JS */
+        min-width: unset;
+        min-height: unset;
+        max-height: 40%; /* Limit height */
+        resize: vertical; /* Only vertical resize on small screens */
+    }
+    #infoOverlay #dragHandle {
+        display: none; /* Hide drag handle on small screens */
+    }
+    #infoOverlay #resizeHandle {
+        bottom: -8px;
+        right: 50%;
+        transform: translateX(50%);
+        cursor: ns-resize; /* Vertical resize cursor */
+        width: 30px; /* Make handle a bit larger */
+        height: 15px;
+        border-radius: 8px;
     }
     #overlayMap {
-        height: 100%;
+        height: 80px; /* Smaller map */
+        margin-bottom: 5px;
     }
-    .overlay-text {
-        font-size: 0.75rem;
-        padding: 6px 10px;
+    .overlay-text > div {
+        font-size: 0.8em;
+        margin-bottom: 2px;
+    }
+    #overlayUserPhoto {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+    #overlayUsername {
+        font-size: 0.75em;
     }
 
-    /* Adjust control panel for better touch experience */
+    /* Control Panel - adjust spacing for small screens */
     #controlPanel {
-        padding: var(--space-sm);
-        gap: var(--space-md);
+        padding: 10px;
     }
-    #captureBtn, #controlPanel button {
-        width: 65px;
-        height: 65px;
+    #controlPanel button {
+        font-size: 1.5em;
+        padding: 8px;
+        margin: 0 2px; /* Reduce spacing between buttons */
     }
     #captureBtn {
-        width: 75px;
-        height: 75px;
+        font-size: 2.5em;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        min-height: 60px;
+        border-width: 3px;
+        margin: 0 5px; /* Adjust margin for capture button */
+    }
+
+    /* Modals adjustments */
+    #previewModal > div,
+    #manualLocationModule > div,
+    #logsModule > div,
+    #settingsModule > div,
+    #galleryModule > div {
+        padding: 20px;
+        max-width: 95%;
+        max-height: 95%;
+    }
+    .action-buttons button .button-text {
+        display: inline; /* Show text in modal buttons */
+    }
+    .manual-grid {
+        grid-template-columns: 1fr; /* Stack inputs vertically */
+        gap: 10px;
+    }
+    #manualMapPlaceholder {
+        height: 150px;
+    }
+    #settingsModule label {
+        font-size: 0.9em;
+    }
+    #settingsModule input {
+        padding: 8px;
+    }
+    #galleryContent {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Smaller thumbnails */
+        gap: 8px;
+        max-height: 300px;
+    }
+    #galleryContent img {
+        width: 80px;
+        height: 80px;
     }
 }
+
+/* ========================================= */
+/*            ORIENTATION MODES              */
+/* ========================================= */
+
+/* Portrait Mode (Default and explicit for body.portrait-mode) */
+body.portrait-mode {
+    flex-direction: column;
+}
+body.portrait-mode main {
+    flex-direction: column;
+}
+body.portrait-mode #cameraContainer {
+    width: 100%;
+    height: 100%;
+}
+body.portrait-mode #cameraView {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(var(--camera-scaleX, 1));
+}
+body.portrait-mode #controlPanel {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+}
+
+/* Landscape Mode */
+body.landscape-mode {
+    flex-direction: row; /* Arrange elements horizontally */
+    overflow: hidden; /* Important for full-screen camera */
+}
+body.landscape-mode nav {
+    /* Hide nav or make it very compact in landscape if needed */
+    display: none; /* Hide nav to maximize camera view */
+}
+body.landscape-mode main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+body.landscape-mode #cameraContainer {
+    width: 100%;
+    height: 100%;
+    position: relative; /* Not absolute within main anymore */
+}
+body.landscape-mode #cameraView {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(var(--camera-scaleX, 1));
+}
+body.landscape-mode #controlPanel {
+    position: relative; /* Becomes part of the flex layout */
+    width: auto; /* Occupy natural width */
+    height: 100%; /* Take full height */
+    padding: 20px 10px; /* Vertical padding */
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    justify-content: space-around; /* Distribute buttons vertically */
+    align-items: center;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+    order: 2; /* Place control panel after camera if nav is hidden */
+}
+body.landscape-mode #controlPanel button {
+    font-size: 1.8em;
+    margin: 10px 0; /* Vertical margin for buttons */
+}
+body.landscape-mode #captureBtn {
+    font-size: 3em;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    min-height: 70px;
+    margin: 15px 0; /* More margin for main capture button */
+}
+
+/* Info Overlay in Landscape */
+body.landscape-mode #infoOverlay {
+    bottom: 20px;
+    left: 20px; /* Position to the left */
+    right: auto;
+    width: 300px;
+    max-height: calc(100% - 40px); /* Use available vertical space */
+    resize: both; /* Re-enable full resize */
+}
+body.landscape-mode #infoOverlay #dragHandle {
+    display: flex; /* Show drag handle */
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+    cursor: grab;
+}
+body.landscape-mode #infoOverlay #resizeHandle {
+    bottom: -12px;
+    right: -12px;
+    transform: none;
+    cursor: nwse-resize;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+body.landscape-mode #overlayMap {
+    height: 120px;
+}
+body.landscape-mode .nav-container .actions .button-text {
+    display: inline; /* Re-show text for wider landscape layouts if nav is visible */
+}
+
+
+/* Specific adjustments for very small landscape screens (e.g., phones) */
+@media (max-height: 500px) and (orientation: landscape) {
+    body.landscape-mode #controlPanel {
+        padding: 10px 5px; /* Reduce padding */
+        width: 70px; /* Make it narrower */
+    }
+    body.landscape-mode #controlPanel button {
+        font-size: 1.4em; /* Smaller icons */
+        margin: 5px 0; /* Reduce vertical margin */
+    }
+    body.landscape-mode #captureBtn {
+        font-size: 2.2em;
+        width: 55px;
+        height: 55px;
+        min-width: 55px;
+        min-height: 55px;
+        border-width: 2px;
+        margin: 10px 0;
+    }
+
+    body.landscape-mode #infoOverlay {
+        width: 250px; /* Smaller overlay */
+        max-height: calc(100% - 20px);
+        left: 10px; /* Closer to edge */
+        bottom: 10px;
+        padding: 10px;
+    }
+    body.landscape-mode #overlayMap {
+        height: 70px;
+    }
+    body.landscape-mode .overlay-text > div {
+        font-size: 0.75em;
+    }
+    body.landscape-mode #overlayUserPhoto {
+        width: 18px;
+        height: 18px;
+    }
+    body.landscape-mode #overlayUsername {
+        font-size: 0.7em;
+    }
+
+    /* Hide brand text in very small landscape if nav is visible */
+    body.landscape-mode .nav-container .brand-text {
+        display: none;
+    }
+    body.landscape-mode .nav-container .actions .button-text {
+        display: none;
+    }
+}
+
+/* ========================================= */
+/*            GLOBAL UTILITIES               */
+/* ========================================= */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Leaflet Custom Location Control Icon */
+.leaflet-control-custom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em; /* Ensure the pin icon is visible */
+}
+
