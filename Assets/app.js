@@ -108,11 +108,11 @@ function initializeAuth() {
 }
 
 // -------------------------------------
-// User Session Info
+// User Session Info (kept mutable so we can update after auth)
 // -------------------------------------
-const storedUID = localStorage.getItem("userUID") || "guest";
-const storedName = localStorage.getItem("userName") || "Guest User";
-const storedPhoto = localStorage.getItem("userPhoto") || "assets/default_user.png";
+let storedUID = localStorage.getItem("userUID") || "guest";
+let storedName = localStorage.getItem("userName") || "Guest User";
+let storedPhoto = localStorage.getItem("userPhoto") || "assets/default_user.png";
 
 // -------------------------------------
 // Global State
@@ -180,9 +180,9 @@ function updateSaveButtonStatus(state = 'default') {
             saveBtn.attr('aria-label', 'Offline mode - saved locally');
             break;
         default:
-            if (!storedUID) {
+            if (storedUID === 'guest') {
                 saveBtn.addClass('warning');
-                saveBtn.attr('aria-label', 'Local save only');
+                saveBtn.attr('aria-label', 'Local save only (guest)');
             } else if (!isFirebaseConnected) {
                 saveBtn.addClass('warning');
                 saveBtn.attr('aria-label', 'Offline mode');
@@ -206,8 +206,9 @@ async function saveEntryToFirebase() {
     saveEntryToLocal(dateStr, entryData);
     updateSaveButtonStatus('saving');
 
-    if (!storedUID) {
-        showToast("User not logged in. Entry saved locally.", "warning");
+    // If running as guest, do local save and notify user to sign in for multi-user cloud sync
+    if (storedUID === 'guest') {
+        showToast("Saved locally (guest). Sign in to sync entries across devices.", "warning");
         updateSaveButtonStatus('warning');
         return;
     }
@@ -235,7 +236,7 @@ async function saveEntryToFirebase() {
 // Firebase: Load Entry
 // ------------------------------------- 
 async function loadEntryFromFirebase(dateStr) {
-    if (!storedUID) return loadEntryFromLocal(dateStr);
+    if (storedUID === 'guest') return loadEntryFromLocal(dateStr);
 
     try {
         // Set up real-time listener (detach previous listener first)
@@ -345,6 +346,10 @@ $(document).ready(async () => {
     // Initialize authentication
     try {
         await initializeAuth();
+        // refresh stored user vars from localStorage (may have been set by initializeAuth)
+        storedUID = localStorage.getItem("userUID") || "guest";
+        storedName = localStorage.getItem("userName") || "Guest User";
+        storedPhoto = localStorage.getItem("userPhoto") || "assets/default_user.png";
         
         quill = new Quill("#editor", {
             theme: "snow",
@@ -357,8 +362,8 @@ $(document).ready(async () => {
         // Editor change handler
         quill.on("text-change", updateSummary);
 
-        $("#userName").text(storedName);
-        $("#userPhoto").attr("src", storedPhoto);
+    $("#userName").text(storedName);
+    $("#userPhoto").attr("src", storedPhoto);
         
         // Initialize theme
         initializeTheme();
@@ -930,4 +935,9 @@ $(document).on("keydown", (e) => {
         e.preventDefault();
         saveEntryToFirebase();
     }
+});
+
+// Save button in dropdown (manual save)
+$('#saveBtn').on('click', function() {
+    saveEntryToFirebase();
 });
