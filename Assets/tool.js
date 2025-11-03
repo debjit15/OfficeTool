@@ -269,10 +269,14 @@ window.addEventListener('appinstalled', () => {
 });
 
 
+// --- FAVORITE TOOLS SYSTEM ---
+
 function getFavoriteTools() {
   try {
     return JSON.parse(localStorage.getItem('favoriteTools') || '[]');
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function setFavoriteTools(favs) {
@@ -284,71 +288,63 @@ function refreshFavorites() {
   const favRow = document.getElementById('favoriteTools');
   const favs = getFavoriteTools();
   favRow.innerHTML = '';
+
   if (favs.length === 0) {
     favSection.classList.add('d-none');
     return;
   }
+
   favSection.classList.remove('d-none');
+
   favs.forEach(toolName => {
-    // Find matching card in dashboard
-    const card = document.querySelector(`[data-tool="${toolName}"]`);
+    const card = document.querySelector(`.modern-card[data-tool="${toolName}"]`);
     if (card) {
-      const clone = card.parentNode.cloneNode(true); // clone .col
-      favRow.appendChild(clone);
+      const col = card.closest('.col-6, .col-md-4, .col-lg-3');
+      if (col) {
+        const clone = col.cloneNode(true);
+        favRow.appendChild(clone);
+      }
     }
   });
 }
 
-document.querySelectorAll('.fav-btn').forEach(btn => {
-  btn.addEventListener('click', function(event) {
-    event.stopPropagation();
-    const card = btn.closest('.tool-card');
-    const toolName = card.getAttribute('data-tool');
-    let favs = getFavoriteTools();
-    if (!favs.includes(toolName)) {
-      favs.push(toolName);
-      setFavoriteTools(favs);
-      btn.classList.add('btn-warning');
-      btn.querySelector('span').textContent = 'star_rate';
-      refreshFavorites();
-    } else {
-      favs = favs.filter(f => f !== toolName);
-      setFavoriteTools(favs);
-      btn.classList.remove('btn-warning');
-      btn.querySelector('span').textContent = 'star';
-      refreshFavorites();
-    }
-  });
-});
-
-// On page load, mark favorite buttons and show favorites
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const favs = getFavoriteTools();
-  document.querySelectorAll('.fav-btn').forEach(btn => {
-    const card = btn.closest('.tool-card');
+
+  // Initialize favorite buttons
+  document.querySelectorAll('.modern-card').forEach(card => {
+    const btn = card.querySelector('.fav-btn');
     const toolName = card.getAttribute('data-tool');
+
+    if (!btn || !toolName) return;
+
     if (favs.includes(toolName)) {
-      btn.classList.add('btn-warning');
+      btn.classList.add('active');
       btn.querySelector('span').textContent = 'star_rate';
     }
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      let currentFavs = getFavoriteTools();
+
+      if (currentFavs.includes(toolName)) {
+        currentFavs = currentFavs.filter(f => f !== toolName);
+        btn.classList.remove('active');
+        btn.querySelector('span').textContent = 'star';
+      } else {
+        currentFavs.push(toolName);
+        btn.classList.add('active');
+        btn.querySelector('span').textContent = 'star_rate';
+      }
+
+      setFavoriteTools(currentFavs);
+      refreshFavorites();
+    });
   });
+
   refreshFavorites();
 });
 
-
-
-document.getElementById('toolSearchInput').addEventListener('input', function() {
-  const query = this.value.toLowerCase();
-  document.querySelectorAll('.tool-card-wrap').forEach(function(card) {
-    const tags = card.getAttribute('data-tags') || '';
-    const text = card.textContent.toLowerCase();
-    if (text.includes(query) || tags.includes(query)) {
-      card.style.display = '';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-});
 
 // PDF & Image Tools JS (Updated)
 // Requires jsPDF and pdf.js for full functionality (add via CDN if not present)
@@ -516,3 +512,223 @@ async function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
+  const canvas = document.getElementById('signaturePad');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  canvas.addEventListener('mousedown', () => drawing = true);
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mousemove', draw);
+
+  canvas.addEventListener('touchstart', () => drawing = true);
+  canvas.addEventListener('touchend', () => drawing = false);
+  canvas.addEventListener('touchmove', drawTouch);
+
+  function draw(e) {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
+
+  function drawTouch(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+  }
+
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function downloadSignature() {
+    const link = document.createElement('a');
+    link.download = 'signature.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+
+/* 🗜️ Image Compressor */
+let compressedData = null;
+function compressImage() {
+  const file = document.getElementById('compressInput').files[0];
+  if (!file) return alert('Select an image first');
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.getElementById('compressCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      compressedData = canvas.toDataURL('image/jpeg', 0.6);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      img.src = compressedData;
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function downloadCompressed() {
+  if (!compressedData) return alert('Compress first');
+  const a = document.createElement('a');
+  a.href = compressedData;
+  a.download = 'compressed.jpg';
+  a.click();
+}
+
+/* 📏 Photo Resizer */
+function resizeImage() {
+  const file = document.getElementById('resizeInput').files[0];
+  const width = +document.getElementById('resizeWidth').value;
+  const height = +document.getElementById('resizeHeight').value;
+  if (!file || !width || !height) return alert('Select image and dimensions');
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.getElementById('resizeCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function downloadResized() {
+  const canvas = document.getElementById('resizeCanvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL();
+  a.download = 'resized.png';
+  a.click();
+}
+
+/* 🔢 Unit Converter */
+function convertUnit() {
+  const type = document.getElementById('unitType').value;
+  const value = parseFloat(document.getElementById('unitValue').value);
+  let result = '';
+  if (type === 'length') result = `${value} m = ${(value * 100).toFixed(2)} cm`;
+  else if (type === 'weight') result = `${value} kg = ${(value * 1000).toFixed(2)} g`;
+  else if (type === 'temperature') result = `${value} °C = ${((value * 9/5) + 32).toFixed(2)} °F`;
+  document.getElementById('unitResult').textContent = result;
+}
+
+/* 💱 Currency Converter (mock) */
+function convertCurrency() {
+  const amount = +document.getElementById('currencyAmount').value;
+  const from = document.getElementById('fromCurrency').value;
+  const to = document.getElementById('toCurrency').value;
+  if (!amount) return alert('Enter amount');
+  const rate = (from === 'USD' && to === 'INR') ? 83.2 :
+               (from === 'INR' && to === 'USD') ? 0.012 :
+               (from === to) ? 1 : 1.1;
+  const converted = (amount * rate).toFixed(2);
+  document.getElementById('currencyResult').textContent = `${amount} ${from} = ${converted} ${to}`;
+}
+
+/* 🔐 Password Generator */
+function generatePassword() {
+  const len = +document.getElementById('passwordLength').value;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+  let pass = '';
+  for (let i = 0; i < len; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  document.getElementById('passwordResult').textContent = pass;
+}
+
+
+let pdfDoc = null;
+let pdfBytes = null;
+let pdfCanvas = document.getElementById('pdfCanvas');
+
+let currentPage = null;
+let pageScale = 1;
+
+// Load and render selected PDF
+document.getElementById('pdfInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  pdfBytes = await file.arrayBuffer();
+  pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+  renderPDFPage(0);
+});
+
+async function renderPDFPage(pageIndex) {
+  const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.mjs');
+  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+  currentPage = await pdf.getPage(pageIndex + 1);
+
+  const viewport = currentPage.getViewport({ scale: 1.5 });
+  pdfCanvas.width = viewport.width;
+  pdfCanvas.height = viewport.height;
+
+  const renderCtx = { canvasContext: ctx, viewport: viewport };
+  await currentPage.render(renderCtx).promise;
+}
+
+// ✏️ Add Text
+document.getElementById('addTextBtn').addEventListener('click', async () => {
+  if (!pdfDoc) return alert('Load a PDF first!');
+  const text = prompt('Enter text to add:');
+  if (!text) return;
+
+  const page = pdfDoc.getPage(0);
+  page.drawText(text, {
+    x: 50,
+    y: 700,
+    size: 14,
+    color: PDFLib.rgb(0, 0, 0.8),
+  });
+
+  pdfBytes = await pdfDoc.save();
+  renderPDFPage(0);
+});
+
+// 🟨 Add Highlight
+document.getElementById('addRectBtn').addEventListener('click', async () => {
+  if (!pdfDoc) return alert('Load a PDF first!');
+  const page = pdfDoc.getPage(0);
+  page.drawRectangle({
+    x: 40,
+    y: 680,
+    width: 200,
+    height: 25,
+    color: PDFLib.rgb(1, 1, 0),
+    opacity: 0.4
+  });
+
+  pdfBytes = await pdfDoc.save();
+  renderPDFPage(0);
+});
+
+// 💾 Download Edited PDF
+document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+  if (!pdfDoc) return alert('No PDF loaded!');
+  const updatedPdfBytes = await pdfDoc.save();
+  const blob = new Blob([updatedPdfBytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'edited.pdf';
+  a.click();
+});
