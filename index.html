@@ -850,29 +850,55 @@ footer {
 </div>
 
 <!-- 📄 PDF Editor Modal -->
-<div class="modal fade" id="pdfEditModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="pdfEditModal" tabindex="-1" aria-labelledby="pdfEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header bg-secondary text-white">
-        <h5 class="modal-title">📄 PDF Editor</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="pdfEditModalLabel">
+          <i class="fas fa-file-pdf me-2"></i>PDF Editor
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
-        <div class="mb-3">
+        <!-- File Upload -->
+        <div class="mb-4">
+          <label for="pdfInput" class="form-label fw-semibold">Upload PDF File</label>
           <input type="file" id="pdfInput" accept="application/pdf" class="form-control">
         </div>
 
-        <div class="toolbar mb-3 d-flex gap-2 justify-content-center flex-wrap">
-          <button class="btn btn-outline-primary btn-sm" id="addTextBtn">Add Text</button>
-          <button class="btn btn-outline-danger btn-sm" id="addRectBtn">Add Highlight</button>
-          <button class="btn btn-outline-success btn-sm" id="downloadPdfBtn">Download PDF</button>
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar mb-4 d-flex flex-wrap justify-content-center gap-3">
+          <button class="btn btn-sm btn-outline-primary" id="addTextBtn">
+            <i class="fas fa-font me-1"></i> Add Text
+          </button>
+          <button class="btn btn-sm btn-outline-warning" id="addRectBtn">
+            <i class="fas fa-highlighter me-1"></i> Highlight Area
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" id="clearAnnotationsBtn">
+            <i class="fas fa-eraser me-1"></i> Clear Annotations
+          </button>
+          <button class="btn btn-sm btn-outline-success" id="downloadPdfBtn">
+            <i class="fas fa-download me-1"></i> Download PDF
+          </button>
         </div>
 
-        <canvas id="pdfCanvas" style="width:100%; border:1px solid #ccc; border-radius:10px;"></canvas>
+        <!-- PDF Canvas Viewer -->
+        <div class="pdf-viewer-container position-relative">
+          <canvas id="pdfCanvas" class="w-100 rounded border border-2" style="min-height: 600px;"></canvas>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <small class="text-muted">PDF editing is local and secure. No files are uploaded.</small>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- 📄 Document Scanner Modal -->
 <div class="modal fade" id="docScannerModal" tabindex="-1" aria-labelledby="docScannerModalLabel" aria-hidden="true">
