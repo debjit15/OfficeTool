@@ -658,41 +658,53 @@ function generatePassword() {
 
 let pdfDoc = null;
 let pdfBytes = null;
-let pdfCanvas = document.getElementById('pdfCanvas');
-
 let currentPage = null;
-let pageScale = 1;
+let pageScale = 1.5;
+let pageIndex = 0;
 
-// Load and render selected PDF
-document.getElementById('pdfInput').addEventListener('change', async (e) => {
+const pdfCanvas = document.getElementById("pdfCanvas");
+const ctx = pdfCanvas.getContext("2d");
+
+// 📥 Load and render selected PDF
+$("#pdfInput").on("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  pdfBytes = await file.arrayBuffer();
-  pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
-  renderPDFPage(0);
+  try {
+    pdfBytes = await file.arrayBuffer();
+    pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+    pageIndex = 0;
+    await renderPDFPage(pageIndex);
+  } catch (err) {
+    alert("Failed to load PDF: " + err.message);
+  }
 });
 
-async function renderPDFPage(pageIndex) {
-  const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.mjs');
+// 📄 Render PDF page using PDF.js
+async function renderPDFPage(index) {
+  const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.mjs");
   const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
-  currentPage = await pdf.getPage(pageIndex + 1);
+  currentPage = await pdf.getPage(index + 1);
 
-  const viewport = currentPage.getViewport({ scale: 1.5 });
+  const viewport = currentPage.getViewport({ scale: pageScale });
   pdfCanvas.width = viewport.width;
   pdfCanvas.height = viewport.height;
 
-  const renderCtx = { canvasContext: ctx, viewport: viewport };
+  const renderCtx = {
+    canvasContext: ctx,
+    viewport: viewport,
+  };
+
   await currentPage.render(renderCtx).promise;
 }
 
-// ✏️ Add Text
-document.getElementById('addTextBtn').addEventListener('click', async () => {
-  if (!pdfDoc) return alert('Load a PDF first!');
-  const text = prompt('Enter text to add:');
+// ✏️ Add Text Annotation
+$("#addTextBtn").on("click", async () => {
+  if (!pdfDoc) return alert("Load a PDF first!");
+  const text = prompt("Enter text to add:");
   if (!text) return;
 
-  const page = pdfDoc.getPage(0);
+  const page = pdfDoc.getPage(pageIndex);
   page.drawText(text, {
     x: 50,
     y: 700,
@@ -701,34 +713,50 @@ document.getElementById('addTextBtn').addEventListener('click', async () => {
   });
 
   pdfBytes = await pdfDoc.save();
-  renderPDFPage(0);
+  await renderPDFPage(pageIndex);
 });
 
-// 🟨 Add Highlight
-document.getElementById('addRectBtn').addEventListener('click', async () => {
-  if (!pdfDoc) return alert('Load a PDF first!');
-  const page = pdfDoc.getPage(0);
+// 🟨 Add Highlight Rectangle
+$("#addRectBtn").on("click", async () => {
+  if (!pdfDoc) return alert("Load a PDF first!");
+
+  const page = pdfDoc.getPage(pageIndex);
   page.drawRectangle({
     x: 40,
     y: 680,
     width: 200,
     height: 25,
     color: PDFLib.rgb(1, 1, 0),
-    opacity: 0.4
+    opacity: 0.4,
   });
 
   pdfBytes = await pdfDoc.save();
-  renderPDFPage(0);
+  await renderPDFPage(pageIndex);
+});
+
+// 🧹 Clear Annotations (optional)
+$("#clearAnnotationsBtn").on("click", async () => {
+  if (!pdfDoc) return alert("Load a PDF first!");
+
+  const copied = await PDFLib.PDFDocument.create();
+  const [page] = await copied.copyPages(pdfDoc, [pageIndex]);
+  copied.addPage(page);
+
+  pdfDoc = copied;
+  pdfBytes = await pdfDoc.save();
+  await renderPDFPage(pageIndex);
 });
 
 // 💾 Download Edited PDF
-document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-  if (!pdfDoc) return alert('No PDF loaded!');
+$("#downloadPdfBtn").on("click", async () => {
+  if (!pdfDoc) return alert("No PDF loaded!");
+
   const updatedPdfBytes = await pdfDoc.save();
-  const blob = new Blob([updatedPdfBytes], { type: 'application/pdf' });
+  const blob = new Blob([updatedPdfBytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'edited.pdf';
+  a.download = "edited.pdf";
   a.click();
 });
