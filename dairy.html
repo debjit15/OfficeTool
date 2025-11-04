@@ -1,338 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Digital Diary - Professional Edition</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital Diary - Professional Edition</title>
 
-    <!-- External CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+  <!-- External CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+  <link href="./Assets/dairy.css" rel="stylesheet">
 
-    <!-- Use diary.css (was dairy.css) - ensure this filename exists in your Assets folder -->
-    <link href="./Assets/dairy.css" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </head>
 <body class="theme-light">
-    <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-glass fixed-top" role="navigation" aria-label="Top Navigation">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#" aria-label="Digital Diary home">
-                <i class="fas fa-book-open text-primary me-2" aria-hidden="true"></i>Digital Diary
-            </a>
 
-            <div class="nav-actions d-flex align-items-center gap-3">
-                <!-- Date Navigation -->
-                <div class="date-nav btn-group" role="group" aria-label="Date navigation">
-                    <button id="prevPageBtn" class="btn btn-glass" title="Previous Day" aria-label="Previous day">
-                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                    </button>
-                    <input type="date" id="datePicker" class="btn btn-glass date-input" aria-label="Select date">
-                    <button id="nextPageBtn" class="btn btn-glass" title="Next Day" aria-label="Next day">
-                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                    </button>
-                </div>
-                
-                <!-- Page Summary (visible icon) -->
-                <button class="btn btn-glass" data-module="summary" title="Page Summary" aria-label="Open page summary">
-                    <i class="fas fa-list-ul" aria-hidden="true"></i>
-                </button>
-
-                <!-- Unified Actions Menu (contains save, tools, export, user actions) -->
-                <div class="dropdown">
-                    <button id="topActionsBtn" class="btn btn-glass" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Open actions menu">
-                        <i class="fas fa-th-large" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end animate__animated animate__slideIn" aria-label="Actions menu">
-                        <li>
-                            <button class="dropdown-item d-flex align-items-center gap-2" id="todayBtn" title="Go to Today" aria-label="Go to today">
-                                <i class="fas fa-calendar-day" aria-hidden="true"></i>
-                                <span>Today</span>
-                            </button>
-                        </li>
-                        <li>
-                            <!-- Keep original save button markup but inside a dropdown item -->
-                            <button class="dropdown-item d-flex align-items-center gap-2" id="saveBtn" aria-live="polite" aria-atomic="true" aria-label="Save status">
-                                <span class="me-2">
-                                    <i class="fas fa-save save-icon" aria-hidden="true"></i>
-                                    <i class="fas fa-sync-alt sync-icon animate-spin" aria-hidden="true" style="display:none;"></i>
-                                    <i class="fas fa-check success-icon" aria-hidden="true" style="display:none;"></i>
-                                    <i class="fas fa-exclamation-triangle warning-icon" aria-hidden="true" style="display:none;"></i>
-                                </span>
-                                <span>Save</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item" data-module="settings">
-                                <i class="fas fa-cog me-2"></i>Settings
-                            </button>
-                        </li>
-                        
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <button class="dropdown-item" id="exportBtn">
-                                <i class="fas fa-file-export me-2"></i>Export Entry
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item" id="printBtn">
-                                <i class="fas fa-print me-2"></i>Print Entry
-                            </button>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <button class="dropdown-item" id="syncBtn">
-                                <i class="fas fa-sync me-2"></i>Sync Entries
-                            </button>
-                        </li>
-                        <li>
-                            <div class="d-flex flex-column px-2">
-                                <button class="dropdown-item align-items-center d-flex" id="backupBtn">
-                                    <i class="fas fa-cloud-download-alt me-2"></i>
-                                    <span>Backup Data</span>
-                                </button>
-                                <small id="backupSublabel" class="text-muted ms-3">Last backup: -</small>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="./index.html" role="menuitem">
-                                <i class="fas fa-sign-out-alt me-2"></i>Exit to Home
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="fas fa-book-open text-primary me-2"></i>Digital Diary
+      </a>
+      <div class="nav-actions d-flex align-items-center gap-3">
+        <div class="date-nav btn-group">
+          <button id="prevPageBtn" class="btn btn-glass" title="Previous Day">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <input type="date" id="datePicker" class="btn btn-glass date-input">
+          <button id="nextPageBtn" class="btn btn-glass" title="Next Day">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container-main animate__animated animate__fadeIn" role="main" aria-labelledby="editor">
-        <div id="pagedEntryContent" class="content-card">
-            <!-- Enhanced Editor Toolbar -->
-            <div id="editorToolbar" class="editor-toolbar" aria-hidden="false">
-                <span class="ql-formats">
-                    <select class="ql-header" aria-label="Header">
-                        <option value="1">Heading 1</option>
-                        <option value="2">Heading 2</option>
-                        <option selected>Normal</option>
-                    </select>
-                    <select class="ql-font" aria-label="Font">
-                        <option selected>Default</option>
-                        <option value="serif">Serif</option>
-                        <option value="monospace">Monospace</option>
-                    </select>
-                </span>
-                <span class="ql-formats">
-                    <button class="ql-bold" aria-label="Bold"></button>
-                    <button class="ql-italic" aria-label="Italic"></button>
-                    <button class="ql-underline" aria-label="Underline"></button>
-                    <button class="ql-strike" aria-label="Strike"></button>
-                </span>
-                <span class="ql-formats">
-                    <select class="ql-color" aria-label="Text color"></select>
-                    <select class="ql-background" aria-label="Background color"></select>
-                </span>
-                <span class="ql-formats">
-                    <button class="ql-list" value="ordered" aria-label="Ordered list"></button>
-                    <button class="ql-list" value="bullet" aria-label="Bullet list"></button>
-                    <button class="ql-indent" value="-1" aria-label="Decrease indent"></button>
-                    <button class="ql-indent" value="+1" aria-label="Increase indent"></button>
-                </span>
-                <span class="ql-formats">
-                    <button class="ql-link" aria-label="Insert link"></button>
-                    <button class="ql-image" aria-label="Insert image"></button>
-                    <button class="ql-code-block" aria-label="Code block"></button>
-                </span>
-                <span class="ql-formats">
-                    <button class="ql-clean" aria-label="Remove formatting"></button>
-                </span>
-            </div>
-
-            <!-- Main Editor -->
-            <div id="editor" style="min-height: 420px;" role="textbox" aria-multiline="true" aria-label="Diary editor"></div>
-
-            <!-- Dynamic Modules Container -->
-            <div id="moduleContainer" class="module-container" aria-live="polite">
-                <!-- Modules will be inserted here dynamically -->
-            </div>
+        <button class="btn btn-glass" data-module="summary" title="Page Summary">
+          <i class="fas fa-list-ul"></i>
+        </button>
+        <div class="dropdown">
+          <button id="topActionsBtn" class="btn btn-glass" data-bs-toggle="dropdown">
+            <i class="fas fa-th-large"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end animate__animated animate__slideIn">
+            <li><button class="dropdown-item d-flex align-items-center gap-2" id="todayBtn"><i class="fas fa-calendar-day"></i><span>Today</span></button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" id="saveBtn"><span class="me-2"><i class="fas fa-save save-icon"></i><i class="fas fa-sync-alt sync-icon animate-spin" style="display:none;"></i><i class="fas fa-check success-icon" style="display:none;"></i><i class="fas fa-exclamation-triangle warning-icon" style="display:none;"></i></span><span>Save</span></button></li>
+            <li><button class="dropdown-item" data-module="settings"><i class="fas fa-cog me-2"></i>Settings</button></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button class="dropdown-item" id="exportBtn"><i class="fas fa-file-export me-2"></i>Export Entry</button></li>
+            <li><button class="dropdown-item" id="printBtn"><i class="fas fa-print me-2"></i>Print Entry</button></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="./index.html"><i class="fas fa-sign-out-alt me-2"></i>Exit to Home</a></li>
+          </ul>
         </div>
-    </main>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Module Templates (Hidden) -->
-    <!-- Settings Modal (Bootstrap) -->
-    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-cog me-2"></i>Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="settings-grid">
-                        <!-- Theme Setting -->
-                        <div class="setting-item mb-3">
-                            <label class="setting-label">
-                                <i class="fas fa-palette me-2" aria-hidden="true"></i>Theme
-                            </label>
-                            <div class="theme-options">
+  <!-- Main Content -->
+  <main class="container-main animate__animated animate__fadeIn">
+    <div id="pagedEntryContent" class="content-card">
+      <div id="editorToolbar" class="editor-toolbar">
+        <span class="ql-formats">
+          <select class="ql-header"><option value="1">Heading 1</option><option value="2">Heading 2</option><option selected>Normal</option></select>
+          <select class="ql-font"><option selected>Default</option><option value="serif">Serif</option><option value="monospace">Monospace</option></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-color"></select><select class="ql-background"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button><button class="ql-indent" value="-1"></button><button class="ql-indent" value="+1"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link"></button><button class="ql-image"></button><button class="ql-code-block"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean"></button>
+        </span>
+      </div>
+      <div id="editor" style="min-height: 420px;"></div>
+      <div id="moduleContainer" class="module-container"></div>
+    </div>
+  </main>
+
+  <!-- Summary Modal -->
+  <div class="modal fade" id="summaryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-list-ul me-2"></i>Complete Diary Summary</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4"><div class="card p-3 mb-2"><small class="text-muted">Total Entries</small><div id="summaryTotalEntries" class="h4">0</div></div></div>
+            <div class="col-md-4"><div class="card p-3 mb-2"><small class="text-muted">Total Words</small><div id="summaryTotalWords" class="h4">0</div></div></div>
+            <div class="col-md-4"><div class="card p-3 mb-2"><small class="text-muted">Average Words / Entry</small><div id="summaryAvgWords" class="h4">0</div></div></div>
+          </div>
+          <input type="text" id="summarySearch" class="form-control mb-3" placeholder="Filter by date or text...">
+          <div class="table-responsive">
+            <canvas id="summaryPieChart" height="160"></canvas>
+            <table class="table table-sm" id="summaryTable">
+              <thead><tr><th>Date</th><th>Words</th><th>Last Modified</th><th>Preview</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-cog me-2"></i>Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-grid">
+            <div class="setting-item mb-3">
+              <label class="setting-label"><i class="fas fa-palette me-2"></i>Theme</label>
+              <div class="theme-options">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light">
-                                    <label class="form-check-label" for="lightTheme"><i class="fas fa-sun"></i> Light</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark">
-                                    <label class="form-check-label" for="darkTheme"><i class="fas fa-moon"></i> Dark</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="theme" id="sepiaTheme" value="sepia">
-                                    <label class="form-check-label" for="sepiaTheme"><i class="fas fa-book"></i> Sepia</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Font Setting -->
-                        <div class="setting-item mb-3">
-                            <label class="setting-label"><i class="fas fa-font me-2"></i>Font Style</label>
-                            <select class="form-select" id="fontSelect" aria-label="Choose font">
-                                <option value="Poppins" style="font-family: Poppins">Poppins</option>
-                                <option value="Merriweather" style="font-family: Merriweather">Merriweather</option>
-                                <option value="Roboto Mono" style="font-family: 'Roboto Mono'">Roboto Mono</option>
-                            </select>
-                        </div>
-
-                        <!-- Font Size Setting -->
-                        <div class="setting-item mb-3">
-                            <label class="setting-label"><i class="fas fa-text-height me-2"></i>Font Size</label>
-                            <div class="d-flex align-items-center gap-3">
-                                <input type="range" class="form-range flex-grow-1" id="fontSizeRange" min="12" max="24" step="1" aria-label="Font size">
-                                <span class="font-size-value" id="fontSizeValue">16px</span>
-                            </div>
-                        </div>
-
-                        <!-- Auto-save Setting -->
-                        <div class="setting-item mb-3">
-                            <label class="setting-label"><i class="fas fa-clock me-2"></i>Auto-save Interval</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="autoSaveInterval" min="5" max="300" value="30" aria-label="Auto save interval">
-                                <span class="input-group-text">seconds</span>
-                            </div>
-                            <small class="text-muted mt-1">Range: 5-300 seconds</small>
-                        </div>
-                    </div>
+                  <input class="form-check-input" type="radio" name="theme" id="lightTheme" value="light">
+                  <label class="form-check-label" for="lightTheme"><i class="fas fa-sun"></i> Light</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary apply-settings"><i class="fas fa-check me-2"></i>Apply Changes</button>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="theme" id="darkTheme" value="dark">
+                  <label class="form-check-label" for="darkTheme"><i class="fas fa-moon"></i> Dark</label>
                 </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="theme" id="sepiaTheme" value="sepia">
+                  <label class="form-check-label" for="sepiaTheme"><i class="fas fa-book"></i> Sepia</label>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Summary Modal (Complete Diary Summary) -->
-    <div class="modal fade" id="summaryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-list-ul me-2"></i>Complete Diary Summary</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <div class="card p-3 mb-2">
-                                <small class="text-muted">Total Entries</small>
-                                <div id="summaryTotalEntries" class="h4">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 mb-2">
-                                <small class="text-muted">Total Words</small>
-                                <div id="summaryTotalWords" class="h4">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card p-3 mb-2">
-                                <small class="text-muted">Average Words / Entry</small>
-                                <div id="summaryAvgWords" class="h4">0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="text" id="summarySearch" class="form-control" placeholder="Filter by date or text...">
-                    </div>
-
-                    <div class="table-responsive">
-                        <div class="mb-3">
-                            <canvas id="summaryPieChart" height="160" aria-label="Summary pie chart"></canvas>
-                        </div>
-                        <table class="table table-sm" id="summaryTable">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Words</th>
-                                    <th>Last Modified</th>
-                                    <th>Preview</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+            <div class="setting-item mb-3">
+              <label class="setting-label"><i class="fas fa-font me-2"></i>Font Style</label>
+              <select class="form-select" id="fontSelect">
+                <option value="Poppins" style="font-family: Poppins">Poppins</option>
+                <option value="Merriweather" style="font-family: Merriweather">Merriweather</option>
+                <option value="Roboto Mono" style="font-family: 'Roboto Mono'">Roboto Mono</option>
+              </select>
             </div>
-        </div>
-    </div>
 
-    <!-- Hidden global image input (used by Add Image action) -->
-    <input type="file" id="globalImageInput" accept="image/*" style="display:none">
-
-    <!-- Confirm Modal -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <p id="confirmText">Confirm action?</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button id="confirmYes" class="btn btn-danger">Yes</button>
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    </div>
-                </div>
+            <div class="setting-item mb-3">
+              <label class="setting-label"><i class="fas fa-text-height me-2"></i>Font Size</label>
+              <div class="d-flex align-items-center gap-3">
+                <input type="range" class="form-range flex-grow-1" id="fontSizeRange" min="12" max="24" step="1">
+                <span class="font-size-value" id="fontSizeValue">16px</span>
+              </div>
             </div>
+
+            <div class="setting-item mb-3">
+              <label class="setting-label"><i class="fas fa-clock me-2"></i>Auto-save Interval</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="autoSaveInterval" min="5" max="300" value="30">
+                <span class="input-group-text">seconds</span>
+              </div>
+              <small class="text-muted mt-1">Range: 5–300 seconds</small>
+            </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary apply-settings"><i class="fas fa-check me-2"></i>Apply Changes</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-content animate__animated animate__pulse animate__infinite">
-            <i class="fas fa-book-open text-primary mb-3 fa-2x" aria-hidden="true"></i>
-            <div class="loading-text">Loading your diary...</div>
+  <!-- Confirm Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <p id="confirmText">Confirm action?</p>
+          <div class="d-flex justify-content-center gap-2">
+            <button id="confirmYes" class="btn btn-danger">Yes</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true"></div>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content animate__animated animate__pulse animate__infinite">
+      <i class="fas fa-book-open text-primary mb-3 fa-2x"></i>
+      <div class="loading-text">Loading your diary...</div>
+    </div>
+  </div>
 
-    <noscript>
-        <div class="alert alert-warning m-3">
-            JavaScript is required for the editor to work. Please enable JavaScript and reload the page.
-        </div>
-    </noscript>
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- Scripts (placed at end) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="./Assets/app.js"></script>
-    
+  <noscript>
+    <div class="alert alert-warning m-3">
+      JavaScript is required for the editor to work. Please enable JavaScript and reload the page.
+    </div>
+  </noscript>
 
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="./Assets/app.js"></script>
 </body>
 </html>
