@@ -69,58 +69,60 @@ function initDiary(uid) {
     }
   }
 
-  function changeDate(offset) {
+ function changeDate(offset) {
+  const $entry = $("#pagedEntryContent");
+  $entry.addClass("page-flip");
+
+  setTimeout(() => {
     const current = new Date($("#datePicker").val() || new Date());
     current.setDate(current.getDate() + offset);
     const newDate = current.toISOString().split("T")[0];
     $("#datePicker").val(newDate);
     loadEntry(newDate);
-  }
+  }, 300); // halfway through animation
+
+  setTimeout(() => {
+    $entry.removeClass("page-flip");
+  }, 600); // end of animation
+}
+
 
   async function populateSummary() {
-    const snapshot = await get(child(ref(db), `entries/${uid}`));
-    const data = snapshot.val() || {};
-    const $tbody = $("#summaryTable tbody");
-    const pieCtx = document.getElementById("summaryPieChart").getContext("2d");
+  const snapshot = await get(child(ref(db), `entries/${uid}`));
+  const data = snapshot.val() || {};
+  const $tbody = $("#summaryTable tbody");
 
-    $tbody.empty();
-    let totalWords = 0;
-    const labels = [], wordCounts = [];
+  $tbody.empty();
+  let totalWords = 0;
 
-    Object.entries(data).forEach(([date, entry]) => {
-      const text = entry.content.replace(/<[^>]+>/g, "");
-      const wordCount = text.trim().split(/\s+/).length;
-      totalWords += wordCount;
+  Object.entries(data).forEach(([date, entry]) => {
+    const text = entry.content.replace(/<[^>]+>/g, "");
+    const wordCount = text.trim().split(/\s+/).length;
+    totalWords += wordCount;
 
-      $tbody.append(`
-        <tr>
-          <td>${date}</td>
-          <td>${wordCount}</td>
-          <td>${new Date(entry.lastModified).toLocaleString()}</td>
-          <td>${text.slice(0, 50)}...</td>
-        </tr>
-      `);
+    const $row = $(`
+      <tr class="summary-row" style="cursor:pointer">
+        <td>${date}</td>
+        <td>${wordCount}</td>
+        <td>${new Date(entry.lastModified).toLocaleString()}</td>
+        <td>${text.slice(0, 50)}...</td>
+      </tr>
+    `);
 
-      labels.push(date);
-      wordCounts.push(wordCount);
+    $row.on("click", () => {
+      $("#datePicker").val(date);
+      loadEntry(date);
+      bootstrap.Modal.getInstance($("#summaryModal")[0])?.hide();
     });
 
-    $("#summaryTotalEntries").text(labels.length);
-    $("#summaryTotalWords").text(totalWords);
-    $("#summaryAvgWords").text(labels.length ? Math.round(totalWords / labels.length) : 0);
+    $tbody.append($row);
+  });
 
-    new Chart(pieCtx, {
-      type: "pie",
-      data: {
-        labels,
-        datasets: [{
-          label: "Words per Entry",
-          data: wordCounts,
-          backgroundColor: labels.map(() => `hsl(${Math.random() * 360}, 70%, 70%)`)
-        }]
-      }
-    });
-  }
+  $("#summaryTotalEntries").text(Object.keys(data).length);
+  $("#summaryTotalWords").text(totalWords);
+  $("#summaryAvgWords").text(Object.keys(data).length ? Math.round(totalWords / Object.keys(data).length) : 0);
+}
+
 
   $(".apply-settings").on("click", () => {
     const theme = $("input[name='theme']:checked").val();
