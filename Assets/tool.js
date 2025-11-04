@@ -663,7 +663,7 @@ let pageScale = 1.5;
 let pageIndex = 0;
 
 const pdfCanvas = document.getElementById("pdfCanvas");
-const ctx = pdfCanvas.getContext("2d");
+const ctxpdfeditor = pdfCanvas.getContext("2d");
 
 // 📥 Load and render selected PDF
 $("#pdfInput").on("change", async (e) => {
@@ -691,7 +691,7 @@ async function renderPDFPage(index) {
   pdfCanvas.height = viewport.height;
 
   const renderCtx = {
-    canvasContext: ctx,
+    canvasContext: ctxpdfeditor,
     viewport: viewport,
   };
 
