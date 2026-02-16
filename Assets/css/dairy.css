@@ -1,0 +1,239 @@
+/* Dairy Specific Styles - Modern Glassmorphism */
+
+:root {
+    --navbar-height: 70px;
+    --editor-min-height: 60vh;
+}
+
+/* Background handled by style.css (body background), but we can add a specific gradient if needed for Dairy */
+body {
+    background: radial-gradient(circle at top left, #a29bfe 0%, #6c5ce7 40%, #dfe6e9 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Theme Overrides */
+body.theme-dark {
+    background: radial-gradient(circle at top left, #2d3436 0%, #000000 100%);
+    color: #dfe6e9;
+}
+
+body.theme-sepia {
+    background: #f4ecd8;
+    color: #5c4b37;
+}
+
+/* Glass Navbar Override if needed, otherwise style.css handles .navbar */
+.navbar-glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.theme-dark .navbar-glass {
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Main Layout */
+.container-main {
+    padding-top: calc(var(--navbar-height) + 20px);
+    padding-bottom: 40px;
+    max-width: 1000px;
+    /* Optimal reading width */
+    margin: 0 auto;
+}
+
+/* Glass Editor Card */
+.content-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-dark .content-card {
+    background: rgba(30, 30, 30, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-sepia .content-card {
+    background: rgba(255, 252, 240, 0.9);
+    border: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+/* Editor Toolbar */
+.editor-toolbar {
+    background: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px;
+}
+
+.theme-dark .editor-toolbar {
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ql-toolbar.ql-snow {
+    border: none !important;
+}
+
+.ql-container.ql-snow {
+    border: none !important;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+#editor {
+    min-height: var(--editor-min-height);
+    padding: 20px 40px;
+    color: var(--text-primary);
+}
+
+.theme-dark #editor {
+    color: #dfe6e9;
+}
+
+.theme-sepia #editor {
+    color: #463420;
+}
+
+/* Date Navigation */
+.date-nav {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 4px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.theme-dark .date-nav {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.date-input {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-weight: 600;
+    text-align: center;
+    width: 140px;
+    outline: none;
+    cursor: pointer;
+}
+
+.theme-dark .date-input {
+    color: #a29bfe;
+}
+
+/* Buttons */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--primary-color);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-glass:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+.theme-dark .btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    color: #dfe6e9;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-dark .btn-glass:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Page Flip Animation */
+.page-flip {
+    animation: flipBook 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+@keyframes flipBook {
+    0% {
+        transform: rotateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: rotateY(90deg);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: rotateY(0);
+        opacity: 1;
+    }
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.theme-dark #loadingOverlay {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+}
+
+/* Modals */
+.modal-content {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.theme-dark .modal-content {
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-main {
+        padding: 80px 15px 20px;
+    }
+
+    .date-input {
+        width: 110px;
+        font-size: 0.9rem;
+    }
+
+    .ql-toolbar.ql-snow {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .navbar-brand span {
+        display: none;
+        /* Hide text on very small screens if needed, or keep */
+    }
+}
