@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCLb8Fcl_Yqqd0EYXciu5wbrAj7-mz1o9M",
@@ -20,12 +20,56 @@ const auth = getAuth(app);
 onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.href = "index.html";
-
   } else {
     initDiary(user.uid);
+    updateProfileUI(user);
+    loadUsageHistory();
     $("#loadingOverlay").hide();
-
   }
+});
+
+function updateProfileUI(user) {
+  const photoURL = user.photoURL || './Assets/icons/icon-256x256.png';
+  const name = user.displayName || 'User';
+  const email = user.email || '';
+
+  // Dropdown
+  $('#userProfileDisplay').show();
+  $('#userPhoto').attr('src', photoURL);
+  $('#userName').text(name);
+  $('#userEmail').text(email);
+
+  // Modal
+  $('#profileModalPhoto').attr('src', photoURL);
+  $('#profileModalName').text(name);
+  $('#profileModalEmail').text(email);
+}
+
+function loadUsageHistory() {
+  const history = JSON.parse(localStorage.getItem('toolUsageHistory') || '[]');
+  const $list = $('#usageHistoryList');
+  $list.empty();
+
+  if (history.length === 0) {
+    $list.html('<div class="text-center text-muted py-3">No recent activity.</div>');
+    return;
+  }
+
+  // Show last 5 items
+  history.slice(0, 5).forEach(item => {
+    $list.append(`
+      <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+        <span class="fw-medium">${item.toolName}</span>
+        <span class="text-muted small" style="font-size: 0.75rem;">${new Date(item.timestamp).toLocaleDateString()}</span>
+      </div>
+    `);
+  });
+}
+
+$('#profileSignOut').on('click', () => {
+  signOut(auth).then(() => {
+    window.location.href = "index.html";
+  });
 });
 
 function initDiary(uid) {
@@ -69,38 +113,38 @@ function initDiary(uid) {
     }
   }
 
- function changeDate(offset) {
-  const $entry = $("#pagedEntryContent");
-  $entry.addClass("page-flip");
+  function changeDate(offset) {
+    const $entry = $("#pagedEntryContent");
+    $entry.addClass("page-flip");
 
-  setTimeout(() => {
-    const current = new Date($("#datePicker").val() || new Date());
-    current.setDate(current.getDate() + offset);
-    const newDate = current.toISOString().split("T")[0];
-    $("#datePicker").val(newDate);
-    loadEntry(newDate);
-  }, 300); // halfway through animation
+    setTimeout(() => {
+      const current = new Date($("#datePicker").val() || new Date());
+      current.setDate(current.getDate() + offset);
+      const newDate = current.toISOString().split("T")[0];
+      $("#datePicker").val(newDate);
+      loadEntry(newDate);
+    }, 300); // halfway through animation
 
-  setTimeout(() => {
-    $entry.removeClass("page-flip");
-  }, 600); // end of animation
-}
+    setTimeout(() => {
+      $entry.removeClass("page-flip");
+    }, 600); // end of animation
+  }
 
 
   async function populateSummary() {
-  const snapshot = await get(child(ref(db), `entries/${uid}`));
-  const data = snapshot.val() || {};
-  const $tbody = $("#summaryTable tbody");
+    const snapshot = await get(child(ref(db), `entries/${uid}`));
+    const data = snapshot.val() || {};
+    const $tbody = $("#summaryTable tbody");
 
-  $tbody.empty();
-  let totalWords = 0;
+    $tbody.empty();
+    let totalWords = 0;
 
-  Object.entries(data).forEach(([date, entry]) => {
-    const text = entry.content.replace(/<[^>]+>/g, "");
-    const wordCount = text.trim().split(/\s+/).length;
-    totalWords += wordCount;
+    Object.entries(data).forEach(([date, entry]) => {
+      const text = entry.content.replace(/<[^>]+>/g, "");
+      const wordCount = text.trim().split(/\s+/).length;
+      totalWords += wordCount;
 
-    const $row = $(`
+      const $row = $(`
       <tr class="summary-row" style="cursor:pointer">
         <td>${date}</td>
         <td>${wordCount}</td>
@@ -109,19 +153,19 @@ function initDiary(uid) {
       </tr>
     `);
 
-    $row.on("click", () => {
-      $("#datePicker").val(date);
-      loadEntry(date);
-      bootstrap.Modal.getInstance($("#summaryModal")[0])?.hide();
+      $row.on("click", () => {
+        $("#datePicker").val(date);
+        loadEntry(date);
+        bootstrap.Modal.getInstance($("#summaryModal")[0])?.hide();
+      });
+
+      $tbody.append($row);
     });
 
-    $tbody.append($row);
-  });
-
-  $("#summaryTotalEntries").text(Object.keys(data).length);
-  $("#summaryTotalWords").text(totalWords);
-  $("#summaryAvgWords").text(Object.keys(data).length ? Math.round(totalWords / Object.keys(data).length) : 0);
-}
+    $("#summaryTotalEntries").text(Object.keys(data).length);
+    $("#summaryTotalWords").text(totalWords);
+    $("#summaryAvgWords").text(Object.keys(data).length ? Math.round(totalWords / Object.keys(data).length) : 0);
+  }
 
 
   $(".apply-settings").on("click", () => {
