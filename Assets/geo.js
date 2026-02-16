@@ -1,3 +1,19 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCLb8Fcl_Yqqd0EYXciu5wbrAj7-mz1o9M",
+    authDomain: "officetools-629fc.firebaseapp.com",
+    databaseURL: "https://officetools-629fc-default-rtdb.firebaseio.com",
+    projectId: "officetools-629fc",
+    storageBucket: "officetools-629fc.firebasestorage.app",
+    messagingSenderId: "888485297465",
+    appId: "1:888485297465:web:f832733b7b78d361067ce8",
+    measurementId: "G-8QE15667LC"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 
 const $cameraContainer = $('#cameraContainer');
@@ -38,6 +54,20 @@ const $manualTimeInput = $('#manualTimeInput');
 const $manualConfirmBtn = $('#manualConfirmBtn');
 const $manualCancelBtn = $('#manualCancelBtn');
 
+// Settings Module
+const $settingsBtn = $('#settingsBtn');
+const $settingsModule = $('#settingsModule');
+const $settingsSaveBtn = $('#settingsSaveBtn');
+const $settingsCancelBtn = $('#settingsCancelBtn');
+const $settingDisplayName = $('#settingDisplayName');
+const $settingPhotoURL = $('#settingPhotoURL');
+
+// Gallery Module
+const $galleryBtn = $('#galleryBtn');
+const $galleryModule = $('#galleryModule');
+const $galleryCloseBtn = $('#galleryCloseBtn');
+const $galleryContent = $('#galleryContent');
+
 let currentStream = null;
 let facingMode = "environment";
 let flashActive = false;
@@ -52,6 +82,33 @@ let currentTime = new Date();
 let currentUsername = 'Guest';
 let currentUserPhoto = 'Assets/default-user.png';
 let isPortrait = window.matchMedia("(orientation: portrait)").matches; // Initial orientation check
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUsername = user.displayName || 'User';
+        currentUserPhoto = user.photoURL || 'Assets/default-user.png';
+
+        // Update Session & LocalStorage (optional sync)
+        localStorage.setItem('userDisplayName', currentUsername);
+        localStorage.setItem('userPhotoURL', currentUserPhoto);
+
+        // Update UI
+        $overlayUsername.text(currentUsername);
+        $overlayUserPhoto.attr('src', currentUserPhoto);
+
+        // Update Settings Inputs
+        $settingDisplayName.val(currentUsername);
+        $settingPhotoURL.val(currentUserPhoto);
+
+        showToast(`Welcome, ${currentUsername}!`, 'success');
+    } else {
+        // Handle guest or signed out state
+        currentUsername = 'Guest';
+        currentUserPhoto = 'Assets/default-user.png';
+        $overlayUsername.text(currentUsername);
+        $overlayUserPhoto.attr('src', currentUserPhoto);
+    }
+});
 
 const log = (msg) => {
     const time = new Date().toLocaleTimeString();
@@ -135,7 +192,16 @@ const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhot
 
     $overlayCoords.text(`Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`);
     $overlayAddress.html(addressHTML || "Address not found");
-    $overlayTime.text(`Time: ${date.toLocaleString()}`);
+    const formattedTime = date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+    $overlayTime.text(formattedTime);
 
     if ($overlayUsername.length && $overlayUserPhoto.length) {
         $overlayUsername.text(username);
@@ -573,6 +639,66 @@ $retakeBtn.on("click", () => {
     closeModalAndReenable($previewModal);
 });
 
+$('#previewModal .close-modal-btn').on('click', () => {
+    log("Preview closed via X. Retaking image.");
+    closeModalAndReenable($previewModal);
+});
+
+// --- Settings Logic ---
+$settingsBtn.on('click', () => {
+    $settingDisplayName.val(localStorage.getItem('userDisplayName') || '');
+    $settingPhotoURL.val(localStorage.getItem('userPhotoURL') || '');
+    $settingsModule.removeClass('hidden');
+});
+
+$settingsCancelBtn.on('click', () => {
+    $settingsModule.addClass('hidden');
+});
+
+$('#settingsCloseX').on('click', () => {
+    $settingsModule.addClass('hidden');
+});
+
+$settingsSaveBtn.on('click', () => {
+    const name = $settingDisplayName.val().trim();
+    const photo = $settingPhotoURL.val().trim();
+
+    if (name) localStorage.setItem('userDisplayName', name);
+    if (photo) localStorage.setItem('userPhotoURL', photo);
+
+    // Update current session variables
+    currentUsername = name || 'Guest';
+    currentUserPhoto = photo || 'Assets/default-user.png';
+
+    // Refresh Overlay
+    $overlayUsername.text(currentUsername);
+    $overlayUserPhoto.attr('src', currentUserPhoto);
+
+    showToast('Settings saved!', 'success');
+    $settingsModule.addClass('hidden');
+});
+
+// --- Gallery Logic ---
+$galleryBtn.on('click', () => {
+    $galleryModule.removeClass('hidden');
+    loadGallery(); // Need to implement or ensure it exists
+});
+
+$galleryCloseBtn.on('click', () => {
+    $galleryModule.addClass('hidden');
+});
+
+$('#galleryCloseX').on('click', () => {
+    $galleryModule.addClass('hidden');
+});
+
+const loadGallery = () => {
+    // Simple placeholder logic for now, as real gallery might need IndexedDB or similar
+    // For this task, we just ensure the module opens/closes.
+    // If we were saving images to localStorage, we could list them here.
+    console.log("Gallery opened");
+};
+
 async function fetchLocation() {
     if (!navigator.geolocation) {
         showToast("Geolocation not supported by this browser.", 'error');
@@ -583,7 +709,6 @@ async function fetchLocation() {
     $overlayAddress.html("📡 Fetching current address...");
     $overlayCoords.text("Lat: ---, Lng: ---");
     log("Requesting current location...");
-
     try {
         const pos = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
