@@ -206,6 +206,34 @@ function initDiary(uid) {
     loadEntry(today);
   });
 
+  // Share Logic
+  $("#shareBtn").on("click", async () => {
+    const date = $("#datePicker").val();
+    const contentText = quill.getText(); // Get plain text from editor
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Diary Entry - ${date}`,
+          text: contentText,
+          url: window.location.href
+        });
+        showToast("Shared successfully!", "success");
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showToast("Error sharing: " + err.message, "danger");
+        }
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(contentText).then(() => {
+        showToast("Share not supported. Text copied to clipboard!", "info");
+      }, () => {
+        showToast("Failed to copy text.", "danger");
+      });
+    }
+  });
+
   const today = new Date().toISOString().split("T")[0];
   $("#datePicker").val(today);
   loadEntry(today);
