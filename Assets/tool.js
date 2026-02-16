@@ -564,46 +564,105 @@ document.getElementById('convertPdfToImageBtn')?.addEventListener('click', async
 });
 
 // --------- Image Compress ---------
-document.getElementById('compressImageBtn')?.addEventListener('click', async function () {
+// --------- Image Compress ---------
+const qualityInput = document.getElementById('compressQuality');
+const qualityLabel = document.querySelector('label[for="compressQuality"]');
+
+// Update quality label on input
+if (qualityInput && qualityLabel) {
+  qualityInput.addEventListener('input', function () {
+    qualityLabel.innerHTML = `Compression Quality: <span class="text-primary fw-bold">${this.value}%</span>`;
+  });
+  // Initialize label
+  qualityLabel.innerHTML = `Compression Quality: <span class="text-primary fw-bold">${qualityInput.value}%</span>`;
+}
+
+document.getElementById('compressImageBtn')?.addEventListener('click', function () {
   const input = document.getElementById('imageCompressInput');
-  const quality = parseInt(document.getElementById('compressQuality')?.value) / 100;
+  const quality = parseInt(qualityInput?.value || 70) / 100;
   const resultDiv = document.getElementById('imageCompressResult');
   const sizeDetailsDiv = document.getElementById('imageCompressSizeDetails');
+
   if (!input.files.length) {
     resultDiv.innerHTML = `<div class="alert alert-warning">Please select an image file.</div>`;
     sizeDetailsDiv.innerHTML = "";
     return;
   }
-  resultDiv.innerHTML = `<div class="text-info">Compressing image...</div>`;
+
+  resultDiv.innerHTML = `<div class="text-info"><div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>Compressing image...</div>`;
   sizeDetailsDiv.innerHTML = "";
+
   const file = input.files[0];
   const originalSize = file.size;
   const img = new Image();
-  img.src = await fileToBase64(file);
+  const objectUrl = URL.createObjectURL(file);
+  img.src = objectUrl;
+
   img.onload = function () {
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
+
+    // Revoke source URL
+    URL.revokeObjectURL(objectUrl);
+
     canvas.toBlob(function (blob) {
+      if (!blob) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">Compression failed.</div>`;
+        return;
+      }
       const url = URL.createObjectURL(blob);
       const compressedSize = blob.size;
-      resultDiv.innerHTML = `<a href="${url}" download="compressed.jpg" class="btn btn-success">Download Compressed Image</a>
-        <img src="${url}" alt="Compressed" style="max-width:100%;border-radius:8px;box-shadow:0 1px 4px #444;" class="mt-2">`;
+      const savings = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+
+      const sizeClass = compressedSize < originalSize ? 'text-success' : 'text-danger';
+      const savingsText = compressedSize < originalSize ? `(Saved ${savings}%)` : '(Size increased)';
+
+      resultDiv.innerHTML = `
+        <div class="d-grid gap-2">
+            <a href="${url}" download="compressed_image.jpg" class="btn btn-success fw-bold">
+                <i class="bi bi-download"></i> Download Compressed Image
+            </a>
+        </div>
+        <div class="text-center mt-3">
+             <img src="${url}" alt="Compressed Preview" style="max-height: 300px; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        </div>`;
+
       sizeDetailsDiv.innerHTML = `
-        <div class="mt-2 text-muted">
-            <b>Original Size:</b> <span class="badge bg-info">${(originalSize / 1024).toFixed(2)} KB</span><br>
-            <b>Compressed Size:</b> <span class="badge bg-success">${(compressedSize / 1024).toFixed(2)} KB</span>
+        <div class="card bg-dark text-light border-secondary mt-3">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span>Original Size:</span>
+                    <span class="badge bg-secondary">${formatBytes(originalSize)}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Compressed:</span>
+                    <span class="badge bg-success">${formatBytes(compressedSize)}</span>
+                </div>
+                <div class="text-end mt-1 small ${sizeClass}">${savingsText}</div>
+            </div>
         </div>
       `;
     }, 'image/jpeg', quality);
   }
+
   img.onerror = function () {
-    resultDiv.innerHTML = `<div class="alert alert-danger">Failed to load image. Please select a valid image file.</div>`;
+    URL.revokeObjectURL(objectUrl);
+    resultDiv.innerHTML = `<div class="alert alert-danger">Failed to load image. Is it a valid image file?</div>`;
     sizeDetailsDiv.innerHTML = "";
   }
 });
+
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 
 // Utility: Convert file to base64
 async function fileToBase64(file) {
