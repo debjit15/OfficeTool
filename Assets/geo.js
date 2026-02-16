@@ -7,7 +7,7 @@ const $rotateBtn = $('#rotateBtn');
 const $flashOverlay = $('#flashOverlay');
 const $flashBtn = $('#flashBtn');
 const $fetchBtn = $('#fetchBtn');
-const $logBtn = $('#logBtn'); 
+const $logBtn = $('#logBtn');
 
 const $logsModule = $('#logsModule');
 const $logsContainer = $('#logs');
@@ -16,12 +16,12 @@ const $closeLogs = $('#closeLogs');
 const $overlayAddress = $('#overlayAddress');
 const $overlayCoords = $('#overlayCoords');
 const $overlayTime = $('#overlayTime');
-const $overlayUsername = $('#overlayUsername'); 
-const $overlayUserPhoto = $('#overlayUserPhoto'); 
+const $overlayUsername = $('#overlayUsername');
+const $overlayUserPhoto = $('#overlayUserPhoto');
 const $overlay = $('#infoOverlay');
 
 const overlayMapElement = document.getElementById("overlayMap"); // Renamed to avoid conflict
-const dragHandle = document.getElementById("dragHandle"); 
+const dragHandle = document.getElementById("dragHandle");
 const resizeHandle = document.getElementById("resizeHandle");
 
 const $previewModal = $('#previewModal');
@@ -33,15 +33,15 @@ const $manualLocationModule = $('#manualLocationModule');
 const $manualMapPlaceholder = $('#manualMapPlaceholder');
 const $manualLatInput = $('#manualLatInput');
 const $manualLngInput = $('#manualLngInput');
-const $manualDateInput = $('#manualDateInput'); 
-const $manualTimeInput = $('#manualTimeInput'); 
+const $manualDateInput = $('#manualDateInput');
+const $manualTimeInput = $('#manualTimeInput');
 const $manualConfirmBtn = $('#manualConfirmBtn');
-const $manualCancelBtn = $('#manualCancelBtn'); 
+const $manualCancelBtn = $('#manualCancelBtn');
 
 let currentStream = null;
 let facingMode = "environment";
 let flashActive = false;
-let map, mapMarker; 
+let map, mapMarker;
 let manualMap, manualMarker;
 let capturedImageData = null;
 const logs = [];
@@ -58,7 +58,7 @@ const log = (msg) => {
     const entry = `[${time}] ${msg}`;
     logs.push(entry);
     // Keep only the last 50 logs to prevent performance issues
-    if (logs.length > 50) logs.shift(); 
+    if (logs.length > 50) logs.shift();
     $logsContainer.html(logs.map(l => `<div>${l}</div>`).join(""));
     $logsContainer.scrollTop($logsContainer[0].scrollHeight);
 };
@@ -85,7 +85,7 @@ $flashBtn.on("click", () => {
     const flashIcon = $flashBtn.find(".material-symbols-outlined");
     flashIcon.text(flashActive ? "flash_on" : "flash_off");
     log(`Flash ${flashActive ? 'enabled' : 'disabled'}.`);
-    $flashBtn.toggleClass('is-flashing', flashActive); 
+    $flashBtn.toggleClass('is-flashing', flashActive);
 });
 
 const createUserIcon = (photoURL) => {
@@ -122,7 +122,7 @@ const createUserIcon = (photoURL) => {
 
 
 const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhoto) => {
-    const fallbackLogo = 'Assets/default-user.png'; // Changed to default-user.png from geo.html
+    const fallbackLogo = './Assets/icons/icon-256x256.png'; // Changed to default-user.png from geo.html
 
     currentLat = lat;
     currentLng = lng;
@@ -132,7 +132,7 @@ const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhot
 
     localStorage.setItem('lastLat', lat);
     localStorage.setItem('lastLng', lng);
-    
+
     $overlayCoords.text(`Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`);
     $overlayAddress.html(addressHTML || "Address not found");
     $overlayTime.text(`Time: ${date.toLocaleString()}`);
@@ -141,7 +141,7 @@ const updateOverlay = (lat, lng, addressHTML, date, username = 'Guest', userPhot
         $overlayUsername.text(username);
         $overlayUserPhoto.attr('src', currentUserPhoto);
 
-        $overlayUserPhoto.off('error').on('error', function() {
+        $overlayUserPhoto.off('error').on('error', function () {
             console.warn(`⚠️ User photo failed to load, using default.`);
             $(this).attr('src', fallbackLogo);
         });
@@ -152,13 +152,13 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
     if (manualMap) {
         manualMap.remove();
     }
-    
+
     manualMap = L.map("manualMapPlaceholder", {
         zoomControl: true,
         scrollWheelZoom: true,
         doubleClickZoom: true,
         dragging: true,
-    }).setView([initialLat, initialLng], 15); 
+    }).setView([initialLat, initialLng], 15);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -166,11 +166,11 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
     }).addTo(manualMap);
 
     manualMarker = L.marker([initialLat, initialLng], { draggable: true }).addTo(manualMap);
-    
+
     L.Control.CurrentLocation = L.Control.extend({
-        onAdd: function(map) {
+        onAdd: function (map) {
             const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-            
+
             container.style.backgroundColor = 'white';
             container.style.width = '30px';
             container.style.height = '30px';
@@ -178,21 +178,21 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
             container.style.textAlign = 'center';
             container.style.cursor = 'pointer';
             container.style.fontSize = '18px'; // Make icon visible
-            container.innerHTML = '📍'; 
-            
-            container.onclick = function() {
+            container.innerHTML = '📍';
+
+            container.onclick = function () {
                 map.locate({ setView: true, maxZoom: 16 });
             }
 
             return container;
         },
 
-        onRemove: function(map) {
+        onRemove: function (map) {
             // Nothing to do here
         }
     });
 
-    L.control.currentLocation = function(opts) {
+    L.control.currentLocation = function (opts) {
         return new L.Control.CurrentLocation(opts);
     }
 
@@ -200,18 +200,18 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
 
     manualMap.on('locationfound', (e) => {
         const { lat, lng } = e.latlng;
-        manualMarker.setLatLng([lat, lng]); 
+        manualMarker.setLatLng([lat, lng]);
         $manualLatInput.val(lat.toFixed(6));
         $manualLngInput.val(lng.toFixed(6));
         L.circle(e.latlng, e.accuracy, {
-            weight: 1, 
-            color: '#136AEC', 
-            fillColor: '#136AEC', 
+            weight: 1,
+            color: '#136AEC',
+            fillColor: '#136AEC',
             fillOpacity: 0.2
         }).addTo(manualMap);
         showToast("Device location found for manual input.", 'info');
     });
-    
+
     manualMap.on('locationerror', (e) => {
         console.error("Location access denied or failed: " + e.message);
         showToast("Could not find your location. Please ensure location services are enabled.", 'error');
@@ -222,28 +222,28 @@ const initManualMap = (initialLat = 0, initialLng = 0) => {
         $manualLatInput.val(lat.toFixed(6));
         $manualLngInput.val(lng.toFixed(6));
     });
-    
+
     manualMap.on('click', (e) => {
         const { lat, lng } = e.latlng;
         manualMarker.setLatLng([lat, lng]);
         $manualLatInput.val(lat.toFixed(6));
         $manualLngInput.val(lng.toFixed(6));
     });
-    
+
     setTimeout(() => manualMap.invalidateSize(true), 100);
 };
 
 const showManualLocationInput = () => {
     $manualLocationModule.removeClass('hidden').find('> div').removeClass('animate__fadeOutDown').addClass('animate__fadeInUp');
-    
+
     $manualLatInput.val(currentLat.toFixed(6));
     $manualLngInput.val(currentLng.toFixed(6));
 
     const now = new Date();
     $manualDateInput.val(now.toISOString().substring(0, 10));
     $manualTimeInput.val(now.toTimeString().substring(0, 5));
-    
-    initManualMap(currentLat, currentLng); 
+
+    initManualMap(currentLat, currentLng);
     log("Manual location input displayed.");
 };
 
@@ -261,7 +261,7 @@ const processManualLocation = async () => {
         showToast("Please enter a valid Date and Time.", 'error');
         return;
     }
-    
+
     const manualDateTime = new Date(`${dateStr}T${timeStr}:00`);
     if (isNaN(manualDateTime)) {
         showToast("Invalid Date or Time format.", 'error');
@@ -269,7 +269,7 @@ const processManualLocation = async () => {
     }
 
     $manualLocationModule.find('> div').removeClass('animate__fadeInUp').addClass('animate__fadeOutDown');
-    $manualLocationModule.on('animationend', function() {
+    $manualLocationModule.on('animationend', function () {
         if ($(this).find('> div').hasClass('animate__fadeOutDown')) {
             $(this).addClass('hidden');
             $(this).off('animationend');
@@ -277,7 +277,7 @@ const processManualLocation = async () => {
     });
 
     log(`Manual data accepted: ${lat.toFixed(6)}, ${lng.toFixed(6)} at ${manualDateTime.toLocaleString()}`);
-    
+
     await reverseGeocodeAndRender(lat, lng, manualDateTime);
 };
 
@@ -296,7 +296,7 @@ const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) =
         const data = await res.json();
 
         let fullAddress = data.formattedAddress;
-        
+
         if (!fullAddress) {
             const addrParts = [
                 data.houseNumber,
@@ -309,9 +309,9 @@ const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) =
             ].filter(Boolean);
             fullAddress = addrParts.join(', ');
         }
-        
+
         addressHTML = fullAddress;
-        
+
         const postalCode = data.postcode || '';
         if (postalCode) {
             addressHTML = addressHTML.replace(postalCode, `<span class="pin-code">${postalCode}</span>`);
@@ -353,7 +353,7 @@ const reverseGeocodeAndRender = async (latitude, longitude, date = new Date()) =
             ].filter(Boolean);
 
             addressHTML = data.display_name || addrParts.join(', ');
-            
+
             const postalCode = address.postcode || '';
             if (postalCode) {
                 addressHTML = addressHTML.replace(postalCode, `<span class="pin-code">${postalCode}</span>`);
@@ -407,8 +407,8 @@ async function startCamera() {
     try {
         // Request higher resolution for better geotagging quality
         const constraints = {
-            video: { 
-                facingMode, 
+            video: {
+                facingMode,
                 width: { ideal: 1920 }, // Increased ideal width
                 height: { ideal: 1080 } // Increased ideal height
             },
@@ -440,21 +440,21 @@ $rotateBtn.on("click", () => {
 const mapToImage = () => {
     return new Promise((resolve, reject) => {
         if (!map) return resolve(null);
-        
+
         const controls = overlayMapElement.querySelectorAll('.leaflet-control-container, .leaflet-control');
         controls.forEach(c => c.style.visibility = 'hidden');
-        
+
         const markerIcon = mapMarker?._icon;
         if (markerIcon) markerIcon.style.visibility = 'visible';
 
         html2canvas(overlayMapElement, { // Use renamed element
             allowTaint: true,
             useCORS: true,
-            scale: 2, 
+            scale: 2,
             backgroundColor: null,
         }).then(canvas => {
             controls.forEach(c => c.style.visibility = 'visible');
-            if (markerIcon) markerIcon.style.visibility = ''; 
+            if (markerIcon) markerIcon.style.visibility = '';
 
             const img = document.createElement('img');
             img.src = canvas.toDataURL('image/png');
@@ -462,7 +462,7 @@ const mapToImage = () => {
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
-            
+
             resolve(img);
         }).catch(err => {
             log("Map to image conversion failed: " + err.message);
@@ -473,7 +473,7 @@ const mapToImage = () => {
 
 $captureBtn.on("click", async () => {
     $captureBtn.addClass('is-capturing');
-    
+
     try {
         if (flashActive) flash();
         log("Capturing image with Geo Tag...");
@@ -485,27 +485,28 @@ $captureBtn.on("click", async () => {
         if (resizeHandle) resizeHandle.style.visibility = 'hidden';
 
         const mapImageElement = await mapToImage();
-        let mapElementPlaceholder = []; 
+        let mapElementPlaceholder = [];
 
         if (mapImageElement) {
             mapElementPlaceholder = Array.from(overlayMapElement.children); // Use renamed element
             overlayMapElement.innerHTML = '';
             overlayMapElement.appendChild(mapImageElement);
         }
-        
+
         const logsWasOpen = !$logsModule.hasClass('hidden');
         if (logsWasOpen) $logsModule.addClass('hidden');
         $flashOverlay.css('visibility', 'hidden');
-        $('#controlPanel').css('visibility', 'hidden'); 
-        $('nav').css('visibility', 'hidden'); 
+        $flashOverlay.css('visibility', 'hidden');
+        $('#bottomDeck').css('visibility', 'hidden');
+        $('#topBar').css('visibility', 'hidden');
 
         // Use a slight delay to ensure all CSS visibility changes are applied
-        await new Promise(resolve => setTimeout(resolve, 50)); 
+        await new Promise(resolve => setTimeout(resolve, 50));
 
         const canvas = await html2canvas($cameraContainer[0], {
             allowTaint: true,
-            useCORS: true, 
-            scale: 2,         
+            useCORS: true,
+            scale: 2,
             removeContainer: true,
         });
 
@@ -516,21 +517,22 @@ $captureBtn.on("click", async () => {
             map.invalidateSize();
         }
 
-        $overlay.css('visibility', ''); 
+        $overlay.css('visibility', '');
         if (dragHandle) dragHandle.style.visibility = '';
         if (resizeHandle) resizeHandle.style.visibility = '';
         $flashOverlay.css('visibility', 'visible');
-        $('#controlPanel').css('visibility', 'visible'); 
-        $('nav').css('visibility', 'visible'); 
+        $flashOverlay.css('visibility', 'visible');
+        $('#bottomDeck').css('visibility', 'visible');
+        $('#topBar').css('visibility', 'visible');
         if (logsWasOpen) $logsModule.removeClass('hidden');
 
         capturedImageData = canvas.toDataURL("image/png");
-        
+
         $previewImage.attr('src', capturedImageData);
-        
+
         $previewModal.removeClass('hidden');
         $previewModal.find('> div').removeClass('animate__fadeOutDown').addClass('animate__zoomIn');
-        
+
         log("Preview modal displayed.");
         $overlay.addClass('pointer-events-none'); // Prevent interaction with overlay behind modal
 
@@ -545,7 +547,7 @@ $captureBtn.on("click", async () => {
 
 const closeModalAndReenable = (element) => {
     element.find('> div').removeClass('animate__zoomIn animate__fadeInUp').addClass('animate__fadeOutDown');
-    element.on('animationend', function() {
+    element.on('animationend', function () {
         if ($(this).find('> div').hasClass('animate__fadeOutDown')) {
             $(this).addClass('hidden');
             $(this).off('animationend'); // Remove listener after animation
@@ -578,7 +580,7 @@ async function fetchLocation() {
         return;
     }
 
-    $overlayAddress.html("📡 Fetching current address..."); 
+    $overlayAddress.html("📡 Fetching current address...");
     $overlayCoords.text("Lat: ---, Lng: ---");
     log("Requesting current location...");
 
@@ -592,9 +594,9 @@ async function fetchLocation() {
         });
 
         locationFailures = 0;
-        
+
         const { latitude, longitude } = pos.coords;
-        
+
         await reverseGeocodeAndRender(latitude, longitude, new Date());
         showToast("Location updated successfully.", 'success'); // Changed to success for good UX
 
@@ -605,18 +607,18 @@ async function fetchLocation() {
         const errorMsg = err.code === 1
             ? "🛑 Permission denied. Please enable location services."
             : err.message.includes("timeout")
-            ? "⏱️ Location request timed out. Try moving outside."
-            : "❌ Unable to get GPS location.";
-        
+                ? "⏱️ Location request timed out. Try moving outside."
+                : "❌ Unable to get GPS location.";
+
         if (locationFailures >= 3) {
             log("Maximum geolocation failures reached. Opening manual input.");
-            showManualLocationInput(); 
+            showManualLocationInput();
         } else {
             showToast(errorMsg, 'error');
-            
+
             updateOverlay(currentLat, currentLng, `<span style="color: red;">${errorMsg}</span><br>Location Unavailable`, new Date());
         }
-        
+
         $overlayCoords.text("Lat: Error, Lng: Error");
     }
 }
@@ -632,7 +634,7 @@ $manualCancelBtn.on("click", () => {
 const updateMapFromManualInputs = () => {
     const lat = parseFloat($manualLatInput.val());
     const lng = parseFloat($manualLngInput.val());
-    
+
     if (manualMap && manualMarker && !isNaN(lat) && lat >= -90 && lat <= 90 && !isNaN(lng) && lng >= -180 && lng <= 180) {
         manualMarker.setLatLng([lat, lng]);
         manualMap.setView([lat, lng], manualMap.getZoom(), { animate: true });
@@ -641,7 +643,7 @@ const updateMapFromManualInputs = () => {
 $manualLatInput.on('input', updateMapFromManualInputs);
 $manualLngInput.on('input', updateMapFromManualInputs);
 
-$('nav #logBtn').on("click", () => {
+$('#logBtn').on("click", () => {
     $logsModule.toggleClass("hidden");
     if (!$logsModule.hasClass('hidden')) {
         $logsContainer.scrollTop($logsContainer[0].scrollHeight); // Scroll to bottom when opening
@@ -651,173 +653,35 @@ $('nav #logBtn').on("click", () => {
 $closeLogs.on("click", () => $logsModule.addClass("hidden"));
 
 // =========================================
-// Overlay Drag & Resize Logic (Modified for Responsiveness)
+// Overlay Drag & Resize Logic REMOVED for Native App Look
 // =========================================
-let drag = false, resize = false, startX, startY;
-const getCoords = (e) => e.touches ? e.touches[0] : e;
-let offsetX = 0;
-let offsetY = 0;
-let containerRect; // Store camera container dimensions
-let overlayInitialWidth, overlayInitialHeight; // Store initial overlay size for resize calculations
-
-const startInteraction = (e) => {
-    if (!$previewModal.hasClass('hidden') || !$manualLocationModule.hasClass('hidden')) return;
-    
-    e.preventDefault(); 
-    e.stopPropagation(); // Stop propagation to prevent accidental camera view interaction
-    
-    containerRect = $cameraContainer[0].getBoundingClientRect(); 
-    const targetId = e.currentTarget.id;
-
-    if (targetId === "resizeHandle") {
-        // Check if resize handle is displayed by CSS (e.g., hidden on small portrait)
-        if (window.getComputedStyle(resizeHandle).display === 'none') return; 
-        resize = true;
-        drag = false;
-        overlayInitialWidth = $overlay.outerWidth();
-        overlayInitialHeight = $overlay.outerHeight();
-    } else if (targetId === "dragHandle" || e.currentTarget === $overlay[0]) {
-        // Check if drag handle is displayed by CSS (e.g., hidden on small portrait)
-        if (targetId === "dragHandle" && window.getComputedStyle(dragHandle).display === 'none') return;
-        drag = true;
-        resize = false;
-    } else {
-        return; 
-    }
-
-    const { clientX, clientY } = getCoords(e);
-    
-    if (drag) {
-        const overlayOffset = $overlay.offset(); // Get current position relative to document
-        offsetX = clientX - overlayOffset.left;
-        offsetY = clientY - overlayOffset.top;
-    } else if (resize) {
-        startX = clientX;
-        startY = clientY;
-    }
-
-    $overlay.addClass('is-interacting');
-};
-
-$overlay.on("mousedown touchstart", "#dragHandle, #resizeHandle", startInteraction);
-$overlay.on("mousedown touchstart", (e) => {
-    // Only allow drag if clicking directly on the overlay AND not on a handle
-    if (e.target === $overlay[0]) {
-        startInteraction(e);
-    }
-});
-
-
-$(document).on("mousemove touchmove", (e) => {
-    if (!drag && !resize) return;
-    
-    e.preventDefault(); 
-    e.stopPropagation(); 
-    
-    const { clientX, clientY } = getCoords(e);
-    
-    if (drag) {
-        let newLeft = clientX - offsetX;
-        let newTop = clientY - offsetY;
-
-        // Constrain overlay within cameraContainer boundaries
-        newLeft = Math.max(containerRect.left, Math.min(newLeft, containerRect.right - $overlay.outerWidth()));
-        newTop = Math.max(containerRect.top, Math.min(newTop, containerRect.bottom - $overlay.outerHeight()));
-        
-        // Convert page coordinates to relative to body/viewport for positioning
-        $overlay.css({ left: `${newLeft}px`, top: `${newTop}px` });
-
-    } else if (resize) {
-        const dx = clientX - startX;
-        const dy = clientY - startY;
-        
-        let currentWidth = $overlay.outerWidth();
-        let currentHeight = $overlay.outerHeight();
-
-        const MIN_WIDTH = 200; // Adjusted min width
-        const MIN_HEIGHT = 120; // Adjusted min height (matching small screen map height)
-
-        let newWidth = overlayInitialWidth + dx;
-        let newHeight = overlayInitialHeight + dy;
-        
-        // Max width/height based on container and current position
-        const maxPossibleWidth = containerRect.right - $overlay.offset().left;
-        const maxPossibleHeight = containerRect.bottom - $overlay.offset().top;
-
-        newWidth = Math.max(MIN_WIDTH, Math.min(newWidth, maxPossibleWidth));
-        newHeight = Math.max(MIN_HEIGHT, Math.min(newHeight, maxPossibleHeight));
-
-        $overlay.css({ 
-            width: `${newWidth}px`, 
-            height: `${newHeight}px` 
-        });
-
-        // Update startX, startY for continuous resizing
-        startX = clientX;
-        startY = clientY;
-        
-        if (map) map.invalidateSize(false); 
-    }
-});
-
-$(document).on("mouseup touchend touchcancel", () => {
-    if (drag || resize) {
-        drag = false;
-        resize = false;
-        $overlay.removeClass('is-interacting');
-        
-        if (map) {
-            map.invalidateSize(true);
-            log("Overlay resize/drag finished. Map redrawn.");
-        } else {
-            log("Overlay interaction ended.");
-        }
-    }
-});
-
+// The new UI uses a fixed 'Tech Overlay' or 'Data Stamp' which is standard for these apps.
+// Drag/Resize logic has been removed to prevent errors with missing handles.
 
 // =========================================
 // Orientation / Resize Handling
 // =========================================
-let orientationTimer;
-
-const applyOrientationClass = () => {
-    isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    if (isPortrait) {
+function applyOrientationClass() {
+    if (window.matchMedia("(orientation: portrait)").matches) {
         $('body').removeClass('landscape-mode').addClass('portrait-mode');
         log("Orientation: Portrait Mode.");
     } else {
         $('body').removeClass('portrait-mode').addClass('landscape-mode');
         log("Orientation: Landscape Mode.");
     }
-    
-    // Recalculate containerRect after orientation change
-    containerRect = $cameraContainer[0].getBoundingClientRect();
 
-    // Reset overlay position to default (bottom-right/bottom-left based on mode)
-    // The CSS media queries will handle the default placement for different orientations/sizes.
-    // If you need more precise JS control, you'd add specific logic here.
-    $overlay.attr('style', ''); // Clear inline style set by JS dragging/resizing
-
-    // Force map redraw in main overlay and manual map
-    if (map) {
-        setTimeout(() => map.invalidateSize(true), 100);
-    }
-    if (manualMap && !$manualLocationModule.hasClass('hidden')) {
-        setTimeout(() => manualMap.invalidateSize(true), 100);
-    }
-};
+    // Force map redraws on orientation change
+    if (map) setTimeout(() => map.invalidateSize(true), 200);
+    if (manualMap) setTimeout(() => manualMap.invalidateSize(true), 200);
+}
 
 // Listen for orientation changes
-window.matchMedia("(orientation: portrait)").addEventListener("change", (e) => {
-    clearTimeout(orientationTimer);
-    orientationTimer = setTimeout(applyOrientationClass, 100);
+window.matchMedia("(orientation: portrait)").addEventListener("change", () => {
+    setTimeout(applyOrientationClass, 100);
 });
 
-// Also trigger on window resize, as orientation might not always trigger 'change' on desktop browsers
 $(window).on('resize', () => {
-    clearTimeout(orientationTimer);
-    orientationTimer = setTimeout(applyOrientationClass, 100);
+    setTimeout(applyOrientationClass, 100);
 });
 
 
@@ -833,11 +697,15 @@ const loadLastLocation = () => {
     }
 }
 
+// =========================================
+// Initialization
+// =========================================
 $(document).ready(() => {
     log("Initializing GeoTag Pro...");
-    applyOrientationClass(); // Set initial orientation class on load
-    loadLastLocation();
-    startCamera();
-    fetchLocation();
+
+    applyOrientationClass(); // Set initial orientation
+    loadLastLocation();      // Load cached location
+    startCamera();           // Start camera stream
+    fetchLocation();         // Fetch fresh GPS
 });
 
