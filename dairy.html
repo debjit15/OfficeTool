@@ -77,6 +77,31 @@
             <!-- Export/Print placeholders if logic exists, otherwise keeping UI clean -->
           </ul>
         </div>
+
+        <!-- User Profile -->
+        <div class="dropdown ms-2" id="userProfileDisplay" style="display: none;">
+          <a href="#" class="d-flex align-items-center text-decoration-none" id="userProfileDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <img id="userPhoto" src="./Assets/icons/icon-256x256.png" alt="User"
+              class="rounded-circle border border-2 border-white" width="40" height="40">
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2"
+            aria-labelledby="userProfileDropdown">
+            <li>
+              <div class="px-3 py-2">
+                <h6 class="mb-0 fw-bold" id="userName">Guest</h6><small class="text-muted"
+                  id="userEmail">guest@example.com</small>
+              </div>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><button class="dropdown-item rounded-2" data-bs-toggle="modal" data-bs-target="#profileModal"><i
+                  class="fas fa-user-circle me-2"></i>My Profile</button></li>
+            <li><a class="dropdown-item rounded-2 text-danger" href="index.html"><i
+                  class="fas fa-home me-2"></i>Home</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
@@ -201,6 +226,38 @@
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-primary w-100 apply-settings rounded-pill">Apply Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">My Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-4">
+            <img id="profileModalPhoto" src="./Assets/icons/icon-256x256.png" class="rounded-circle mb-3 shadow"
+              width="80" height="80">
+            <h5 id="profileModalName" class="fw-bold mb-0">Guest</h5>
+            <p id="profileModalEmail" class="text-muted small">guest@example.com</p>
+          </div>
+
+          <div class="profile-stats-container">
+            <h6 class="fw-bold border-bottom pb-2 mb-3">Recent Activity</h6>
+            <div id="usageHistoryList" class="list-group list-group-flush small">
+              <!-- History items injected via JS -->
+              <div class="text-center text-muted py-3">No recent activity.</div>
+            </div>
+          </div>
+
+          <div class="d-grid mt-4">
+            <button class="btn btn-danger rounded-pill" id="profileSignOut">Sign Out</button>
+          </div>
         </div>
       </div>
     </div>
