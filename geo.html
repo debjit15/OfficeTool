@@ -65,8 +65,9 @@
                             <span class="material-symbols-outlined icon-small">explore</span>
                             <div id="overlayCoords">Lat: ---, Lng: ---</div>
                         </div>
-                    <div class="detail-row user-row">
-                            <img id="overlayUserPhoto" src="./Assets/icons/icon-256x256.png" alt="User" class="user-avatar">
+                        <div class="detail-row user-row">
+                            <img id="overlayUserPhoto" src="./Assets/icons/icon-256x256.png" alt="User"
+                                class="user-avatar">
                             <div id="overlayUsername">Guest User</div>
                         </div>
                     </div>
@@ -110,6 +111,9 @@
 
     <div id="previewModal" class="hidden">
         <div class="module-content animate__animated">
+            <button class="close-modal-btn absolute-close">
+                <span class="material-symbols-outlined">close</span>
+            </button>
             <h2>Image Preview</h2>
             <div class="content-wrapper">
                 <img id="previewImage" alt="Captured Geotagged Image">
@@ -175,6 +179,9 @@
     <!-- New Settings Module -->
     <div id="settingsModule" class="hidden">
         <div class="module-content animate__animated">
+            <button class="close-modal-btn absolute-close" id="settingsCloseX">
+                <span class="material-symbols-outlined">close</span>
+            </button>
             <h2>App Settings</h2>
             <div class="settings-section">
                 <h3>User Information</h3>
@@ -202,6 +209,9 @@
     <!-- New Gallery Module -->
     <div id="galleryModule" class="hidden">
         <div class="module-content animate__animated">
+            <button class="close-modal-btn absolute-close" id="galleryCloseX">
+                <span class="material-symbols-outlined">close</span>
+            </button>
             <h2>Image Gallery</h2>
             <div id="galleryContent">
                 <p class="text-light-gray">No images captured yet. Take a photo!</p>
@@ -222,7 +232,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <!-- Make sure to update geo.js with the new orientation logic -->
-    <script src="./Assets/geo.js"></script>
+    <script type="module" src="./Assets/geo.js"></script>
 
 </body>
 
